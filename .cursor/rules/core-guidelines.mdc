@@ -1,0 +1,180 @@
+---
+description: Core engineering guidelines and guardrails for React + Next.js + TypeScript + Tailwind + shadcn projects with BDD testing, ESLint, and Prettier
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+### Purpose
+These rules define how code should be written, structured, reviewed, and tested in this project. They are optimized for:
+- React (functional components, hooks-first)
+- Next.js App Router (server components by default)
+- TypeScript (strict, no `any`)
+- Tailwind CSS (utility-first with `prettier-plugin-tailwindcss`)
+- shadcn/ui (composable, accessible primitives)
+- Comprehensive automated testing with a BDD mindset
+- ESLint + Prettier enforcement
+
+### Architecture & Project Structure
+- Prefer server components by default in `app/`. Use client components only when interactivity is required. Add `'use client'` with intention.
+- Co-locate code by feature; keep cross-cutting utilities in `lib/`, types in `types/`, UI primitives in `components/ui` (shadcn), and shared components in `components/`.
+- Route handlers live in `app/**/route.ts` or `app/api/**/route.ts`. Use typed inputs/outputs.
+- Data fetching: use Next.js `fetch` with caching and revalidation. Prefer server-side data fetching. Minimize client-side fetching; if needed, use a lightweight state/query library.
+- Keep client state minimal. Prefer derived state and server mutations via server actions or route handlers.
+- Avoid global state unless necessary; prefer props-drilling boundaries and context for cross-cutting concerns only.
+
+### Lightweight Clean Architecture (80/20)
+- Adopt a pragmatic Clean Architecture layering without ceremony. Optimize for clarity and testability, not dogma.
+- Layers (outer depends on inner; inner knows nothing about outer):
+  - Entities: core business rules (e.g., `Event`, `Feedback`). Pure TypeScript; no framework/DB imports.
+  - Application (Use Cases): orchestrate domain logic and ports. Small functions or simple classes. Input/output are plain types/DTOs.
+  - Ports (Interfaces): repository and service contracts consumed by use cases (e.g., `FeedbackRepository`, `EventRepository`, `SummaryService`).
+  - Infrastructure (Adapters): concrete implementations of ports (Prisma repositories, Socket emitter, OpenAI client), and cross-cutting concerns.
+  - Interface (Web/UI): Next.js route handlers and React components. Route handlers validate/map I/O and invoke use cases.
+- 80/20 guidance:
+  - Start simple. Introduce use cases and ports where logic is non-trivial or reused. Don’t split files/types if it doesn’t add clarity.
+  - Prefer dependency injection via function parameters/constructors. Avoid global singletons and DI containers.
+  - Keep core business code (entities/use cases) pure. Put validation at boundaries (route handlers) with `zod`; map to DTOs.
+  - Transactions live in infrastructure. Pass transaction/context to repositories when needed.
+  - Testing: unit test use cases with in-memory fakes for ports; add minimal contract tests ensuring infra matches port behavior.
+- Suggested layout (example; adapt per feature):
+```
+domain/
+  feedback.ts, event.ts
+application/
+  ports/FeedbackRepository.ts
+  usecases/
+    listFeedbacks.ts
+    createFeedback.ts
+infrastructure/
+  repositories/prisma/FeedbackRepositoryPrisma.ts
+  realtime/socket.ts
+app/
+  api/v1/... (route handlers call use cases)
+lib/
+  validation.ts, responses.ts, cursor.ts
+```
+
+### TypeScript Standards
+- Enable strict mode everywhere. Ban `any`; prefer `unknown` then narrow. Export explicit types for public APIs.
+- Name types and interfaces clearly: `PascalCase` for types/interfaces, `camelCase` for variables and functions, `SCREAMING_SNAKE_CASE` for constants.
+- Narrow external data at the boundary using a schema validator (e.g., `zod`) to create runtime-safe types.
+- No default exports for shared utilities/types; prefer named exports. For Next.js pages/layouts/components where the framework expects defaults, default export is allowed.
+- Avoid side effects in modules. Keep modules pure and focused.
+
+### React & Component Guidelines
+- Functional components only. Hooks for lifecycle and state. Keep components small and focused.
+- Props:
+  - Define explicit prop types. Avoid `any` and overly broad `Record<string, unknown>`.
+  - Boolean props should read positively (e.g., `disabled`, not `isNotEnabled`).
+  - Use discriminated unions for variant-like logic.
+- Rendering:
+  - Memoize expensive computations with `useMemo` and callbacks with `useCallback` only when necessary and measured.
+  - Split large components; extract `useXyz` hooks for complex logic.
+  - Avoid prop drilling more than 2 levels; consider context or composition.
+- Accessibility (a11y):
+  - Always provide accessible labels, roles, and keyboard interactions.
+  - Prefer semantic HTML before ARIA.
+  - Use shadcn/ui primitives for accessible patterns.
+
+### Next.js Conventions
+- App Router, file-based routing. Co-locate loading and error UI (`loading.tsx`, `error.tsx`).
+- Server-first mindset:
+  - Use server components for data fetching and rendering heavy UIs.
+  - Use client components for interactivity and browser-only APIs.
+- Caching and revalidation:
+  - Use `fetch` with `{ next: { revalidate: number } }` or `cache: 'no-store'` intentionally.
+  - Use `revalidatePath` or `revalidateTag` for server mutations.
+- Metadata: set `generateMetadata` for SEO. Avoid client-only SEO workarounds.
+- Route Handlers: validate input, return typed responses, and handle errors explicitly.
+
+### Tailwind & shadcn UI
+- Tailwind:
+  - Use `prettier-plugin-tailwindcss` to sort classes. Avoid arbitrary values; extend the theme in `tailwind.config`.
+  - Create a local `cn` utility using `clsx` + `tailwind-merge` to compose classes safely.
+  - Prefer composition over deep nested CSS. Use variants via `class-variance-authority` (CVA) for component states.
+- shadcn/ui:
+  - Add components via generator and keep them under `components/ui`. Do not modify library primitives directly; wrap or extend locally as needed.
+  - Keep tokens (colors, spacing, radii) in Tailwind config aligned with shadcn defaults or your design system.
+  - Ensure components remain accessible and themeable (dark mode, reduced motion).
+
+### Testing Strategy (BDD-first)
+- Pyramid shape: unit > component/integration > e2e. All tests should read like specifications (Given-When-Then mindset), even if not all use `.feature` files.
+- Unit & Component tests:
+  - Use a fast test runner (e.g., Vitest) with Testing Library for React components.
+  - Write specs with clear `describe/it` in BDD style. Favor behavior over implementation details.
+  - Test critical hooks and utility functions with focused unit tests.
+- E2E tests:
+  - Use Playwright (recommended for Next.js) or Cypress. For strict BDD, pair with Gherkin `.feature` files via a suitable adapter (e.g., `playwright-bdd` or Cypress Cucumber preprocessor).
+  - Keep scenarios business-focused and stable. Test happy paths and critical edge cases. Prefer data-testids for stable selectors.
+- Contract/API tests:
+  - Validate route handlers with request/response schemas. Use supertest or Playwright API testing where appropriate.
+- Coverage:
+  - Aim for high, meaningful coverage on core domains. Avoid chasing 100% if it forces brittle tests.
+- Test layout:
+  - Co-locate unit/component tests next to source as `*.test.ts(x)`.
+  - Place e2e under `e2e/` with clear domain-based structure. Keep `.feature` files in `e2e/features/` if using Gherkin.
+
+### Linting, Formatting, and Static Checks
+- ESLint:
+  - Base: `eslint-config-next` (or `@next/eslint-plugin-next`) + `@typescript-eslint` + `eslint-plugin-react-hooks` + `eslint-plugin-tailwindcss`.
+  - Testing: `eslint-plugin-testing-library` and `eslint-plugin-jest-dom` for component tests.
+  - Rules: no `any`, exhaustive deps for hooks, consistent type imports, import order, no unused vars, prefer const.
+- Prettier:
+  - Use `prettier` + `prettier-plugin-tailwindcss`. Prettier is the single source of formatting truth; do not override formatting via ESLint.
+- Type checks:
+  - CI should run `tsc --noEmit` or `next build` typecheck phase and fail on errors.
+
+### Performance & Reliability
+- Measure before optimizing. Use React Profiler and browser perf tools when needed.
+- Use `next/image` for images, `next/font` for fonts. Avoid large client bundles; tree-shake aggressively.
+- Avoid unstable keys and expensive computations in render. Memoize lists and handlers only when profiled.
+- Handle errors explicitly; never swallow exceptions. Provide user-friendly error boundaries.
+
+### Git, Branching, and PRs
+- Use Conventional Commits. Scope by feature/domain (e.g., `feat(auth): add magic link flow`).
+- Short-lived branches. Open drafts early. Keep PRs small and focused (ideally < 300 lines diff).
+- Every PR must pass: typecheck, lint, format check, unit/component tests, and e2e smoke (on main or nightly if heavy).
+- Require at least one review for non-trivial changes. Ensure test coverage for new features and bug fixes.
+
+### Checklists
+- New component (shadcn/Tailwind):
+  - Props typed and minimal. Variants via CVA. Accessible by default.
+  - Tailwind classes sorted by Prettier. No arbitrary values unless justified.
+  - Unit/component tests cover core behaviors.
+- New route/feature:
+  - Server-first. Input validated at boundary. Output typed.
+  - Loading and error UI present. Revalidation strategy documented.
+  - Tests: unit for logic, component for UI flows, e2e for happy path.
+- Refactor:
+  - Maintain behavior. Update tests as living specs. Keep diffs small.
+
+### What to ask the assistant to do (automation hints)
+- When adding a component:
+  - Generate a shadcn primitive or wrap an existing one in `components/ui` with CVA variants and a `cn` helper.
+  - Create `*.test.tsx` with Testing Library in BDD-phrased `describe/it` and meaningful assertions.
+- When adding a route:
+  - Scaffold `app/(segment)/page.tsx` with server component by default. Add `loading.tsx`/`error.tsx` as needed.
+  - Implement route handler with input validation and typed responses. Add unit tests and an e2e scenario.
+- When configuring tooling:
+  - Set up ESLint with Next + TS + React Hooks + Tailwind plugins; Prettier with Tailwind plugin; Vitest + RTL; Playwright with BDD adapter if `.feature` is present.
+
+### Non-negotiables
+- No unchecked `any`. No dead code. No disabled linters without a written justification.
+- No direct DOM manipulation in React components (except via refs with care).
+- No network calls in client components unless strictly necessary.
+- Keep third-party additions minimal and intentional.
+
+### Style Preferences
+- Prefer early returns over deep nesting. Keep functions small and named for intent.
+- Use meaningful names; avoid abbreviations and magic numbers.
+- Write error messages and test names in plain language that reflects business behavior.
+
+### Example Config Sketches (reference only; do not enforce here)
+- ESLint key plugins: `eslint-config-next`, `@typescript-eslint/eslint-plugin`, `eslint-plugin-react-hooks`, `eslint-plugin-tailwindcss`, `eslint-plugin-testing-library`, `eslint-plugin-jest-dom`.
+- Prettier: `prettier-plugin-tailwindcss`.
+- Tests: `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `@playwright/test` (+ optional `playwright-bdd`) or Cypress + Cucumber.
+
+### How to evolve these rules
+- Propose changes in PRs using real examples and trade-offs. Keep rules concise and actionable.
+- Document exceptions in code with a short rationale and a link to the discussion when needed.
