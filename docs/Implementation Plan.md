@@ -96,7 +96,7 @@ prisma/
 - [x] GitHub Actions CI: install, lint, typecheck, unit tests, build
 - [x] Add PostgreSQL to docker-compose.yml with persistent volume
 - [x] Add Prisma ORM dependency and configure DATABASE_URL
-- [ ] Create .env.local template with database connection string
+- [x] Create .env.local template with database connection string
 - [x] Add database setup instructions to README
 
 
@@ -108,12 +108,12 @@ Deliverable: CI green on a hello route; homepage renders with Tailwind.
   - [x] `Event(id uuid @id, name String @unique)`
   - [x] `Feedback(id uuid @id, eventId uuid, rating Int, text String, createdAt DateTime @default(now()))`
   - [x] Optional `EventSummary(eventId uuid @id, summary String, updatedAt DateTime)`
-- [ ] Add DB constraints (CHECK) for rating 1..5, text length 1..1000
+- [x] Add DB constraints (CHECK) for rating 1..5, text length 1..1000
 - [x] Composite indexes for keyset (global newest/highest; per-event variants)
-- [ ] `prisma migrate dev` or `db push` for take-home
+- [x] `prisma migrate dev` or `db push` for take-home
 - [x] Seed script `prisma/seed.ts`: 4–6 events; 200–400 feedback rows over last 24–72h
 - [x] README section with seeding instructions
-- [ ] Spot-check with psql/Prisma queries
+- [x] Spot-check with psql/Prisma queries
 
 Definition of done: Schema constraints enforced; seeds generated without errors.
 
