@@ -3,10 +3,11 @@
 NPM ?= npm
 DOCKER ?= docker
 COMPOSE ?= docker compose
+DATABASE_URL ?= postgresql://postgres:postgres@localhost:5432/event_feedback_hub?schema=public
 
 .PHONY: help install dev build start lint typecheck format format-check test test-watch test-e2e ci \
 	docker-build docker-run compose-up compose-down playwright-install prisma-generate prisma-migrate prisma-studio \
-	db-up db-down
+	db-up db-down seed prisma-migrate-name prisma-reset reset-and-seed
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS=":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -63,18 +64,31 @@ compose-down: ## Stop services and remove volumes
 	$(COMPOSE) down -v
 
 prisma-generate: ## Generate Prisma client
-	$(NPM) exec prisma generate
+	env DATABASE_URL="$(DATABASE_URL)" $(NPM) exec prisma generate
 
-prisma-migrate: ## Run Prisma migrate dev
-	$(NPM) exec prisma migrate dev --name init
+prisma-migrate: ## Run Prisma migrate dev (apply any pending migrations)
+	env DATABASE_URL="$(DATABASE_URL)" $(NPM) exec prisma migrate dev
+
+prisma-migrate-name: ## Create a new named migration without applying: make prisma-migrate-name NAME=add_feature
+	@[ -n "$(NAME)" ] || (echo "NAME is required, e.g. make prisma-migrate-name NAME=add_feature" && exit 1)
+	env DATABASE_URL="$(DATABASE_URL)" $(NPM) exec prisma migrate dev --name "$(NAME)" --create-only
+
+prisma-reset: ## Reset database and reapply all migrations (DANGER: drops data)
+	env DATABASE_URL="$(DATABASE_URL)" $(NPM) exec prisma migrate reset --force --skip-seed
 
 prisma-studio: ## Open Prisma Studio
-	$(NPM) exec prisma studio
+	env DATABASE_URL="$(DATABASE_URL)" $(NPM) exec prisma studio
 
 db-up: ## Start Postgres and Redis via compose
 	$(COMPOSE) up -d postgres redis
 
 db-down: ## Stop Postgres and Redis and remove volumes
 	$(COMPOSE) down -v
+
+seed: ## Seed the database with sample data
+	env DATABASE_URL="$(DATABASE_URL)" $(NPM) run db:seed
+
+reset-and-seed: ## Reset DB, apply migrations, and seed
+	$(MAKE) prisma-reset && $(MAKE) seed
 
 
