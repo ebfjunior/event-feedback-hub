@@ -135,12 +135,12 @@ Lightweight Clean Architecture layers (80/20):
 
 ### 3. API Endpoints (`/api/v1`)
 
-- [ ] `GET /api/v1/events` → list events for dropdown
-- [ ] `GET /api/v1/feedbacks` → filters: `event_id?`, `rating?`; sort: `newest|highest`; cursor; limit<=50
-- [ ] `GET /api/v1/events/:event_id/feedbacks` → same envelope, scoped
-- [ ] `POST /api/v1/feedbacks` → validates and creates feedback; returns item with `event_name`
-- [ ] Error envelopes per PRD with Zod-driven details
-- [ ] Timestamps RFC3339
+- [x] `GET /api/v1/events` → list events for dropdown
+- [x] `GET /api/v1/feedbacks` → filters: `event_id?`, `rating?`; sort: `newest|highest`; cursor; limit<=50
+- [x] `GET /api/v1/events/:event_id/feedbacks` → same envelope, scoped
+- [x] `POST /api/v1/feedbacks` → validates and creates feedback; returns item with `event_name`
+- [x] Error envelopes per PRD with Zod-driven details
+- [x] Timestamps RFC3339
 - [ ] Unit/request tests: ordering correctness, cursor progression, bounds and 400/404/422
 
 Route handler pattern:
