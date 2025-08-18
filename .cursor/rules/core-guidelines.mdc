@@ -137,6 +137,58 @@ lib/
 - Every PR must pass: typecheck, lint, format check, unit/component tests, and e2e smoke (on main or nightly if heavy).
 - Require at least one review for non-trivial changes. Ensure test coverage for new features and bug fixes.
 
+### Conventional Commits
+- Format: `<type>(<scope>)!: <subject>`
+  - `type`: one of
+    - `feat`: user-facing feature
+    - `fix`: bug fix
+    - `docs`: documentation only
+    - `style`: formatting/whitespace, no code behavior change
+    - `refactor`: code change that neither fixes a bug nor adds a feature
+    - `perf`: performance improvement
+    - `test`: adding or fixing tests
+    - `build`: build system or external dependencies changes
+    - `ci`: CI configuration or scripts
+    - `chore`: routine tasks (repo maintenance, tooling tweaks)
+    - `revert`: revert a previous commit
+  - `scope` (optional): feature or area in kebab-case (e.g., `api`, `infra/prisma`, `ui/feedback-card`). Prefer product/tech domain over file paths.
+  - `!` (optional): mark breaking change when behavior/API changes.
+  - `subject`: imperative, lower-case, no trailing period (e.g., "add endpoint for listing feedbacks").
+
+- Body (optional but recommended):
+  - Explain what and why, not how.
+  - Include context, trade-offs, perf numbers, and links to discussions.
+  - Wrap at ~72 chars per line.
+
+- Footer (optional):
+  - Issues: `Closes #123`, `Refs #456`.
+  - Breaking changes: either use `!` in header or add a `BREAKING CHANGE:` footer with migration notes.
+  - Co-authors: `Co-authored-by: Name <email>`.
+
+- Examples:
+```text
+feat(api): add GET /api/v1/feedbacks with keyset pagination
+
+fix(ui/submit-form): prevent empty text submission and show inline error
+
+refactor(application): extract createFeedback use case and ports
+
+perf(db): add composite index for highest-sort tuple
+
+docs(readme): add database setup and seeding instructions
+
+feat(api)!: rename rating filter to rating_min and rating_max
+
+BREAKING CHANGE: Clients must send rating_min/rating_max instead of rating.
+
+revert: feat(api): add experimental summaries endpoint
+
+This reverts commit 1a2b3c4.
+```
+
+- PR titles: follow the same format as the conventional commit that best represents the change.
+- Merges: prefer squash-and-merge; ensure the final commit message conforms to the convention.
+
 ### Checklists
 - New component (shadcn/Tailwind):
   - Props typed and minimal. Variants via CVA. Accessible by default.
