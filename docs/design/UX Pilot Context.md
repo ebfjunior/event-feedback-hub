@@ -29,11 +29,13 @@ You are designing UI/UX mocks for "Event Feedback HUB" — a small, anonymous Ra
 **Header:** "Events Feedback HUB"
 
 **Controls bar** (sticky at top of stream section on scroll):
+
 - EventSelect (dropdown with seeded events: "Keynote", "Workshop A/B", "Product Panel")
 - RatingSelect (1–5)
 - SortToggle: Newest (default) / Highest
 
 **Submission Form** (sticky at page top):
+
 - Textarea (1–1000 chars), character counter, placeholder "Your feedback…"
 - Star rating as an accessible radio group (labels "1 star"…"5 stars"; keyboard 1–5 + arrows)
 - Submit button with loading/disabled states
@@ -41,6 +43,7 @@ You are designing UI/UX mocks for "Event Feedback HUB" — a small, anonymous Ra
 - Validation states: missing event, rating out of range, text too short/long
 
 **Live Stream:**
+
 - List of FeedbackCard items (star icons, escaped text, event name, relative timestamp)
 - Infinite scroll (IntersectionObserver): loading spinner row; page-size ~20
 - Empty states: no results (filters), initial empty feed
@@ -85,6 +88,7 @@ You are designing UI/UX mocks for "Event Feedback HUB" — a small, anonymous Ra
 ## Deliverables
 
 **Figma file with:**
+
 - Wireframes → High-fidelity mockups for Home (+ optional Event View)
 - Component variants (default/hover/focus/disabled/loading/error)
 - Light/Dark mode examples
@@ -98,6 +102,7 @@ You are designing UI/UX mocks for "Event Feedback HUB" — a small, anonymous Ra
 **Events:** Keynote, Workshop A, Workshop B, Product Panel
 
 **Example cards:**
+
 - ★★★★★ "Loved it!" Workshop A · 2m ago
 - ★★☆☆☆ "Too long" Keynote · 5m ago
 

@@ -72,13 +72,13 @@ prisma/
 
 ## Milestones (hill chart)
 
-1) Skeleton up (Downhill starts)
-2) Data model & seeds
-3) Listing API w/ keyset
-4) Submit + broadcast
-5) Frontend UX (infinite scroll, filters/sort, live updates)
-6) Optional summaries
-7) Hardening, QA pass, README
+1. Skeleton up (Downhill starts)
+2. Data model & seeds
+3. Listing API w/ keyset
+4. Submit + broadcast
+5. Frontend UX (infinite scroll, filters/sort, live updates)
+6. Optional summaries
+7. Hardening, QA pass, README
 
 ---
 
@@ -86,28 +86,33 @@ prisma/
 
 ### 0. Project Setup & Tooling
 
-- [ ] Initialize Next.js 14 App Router project with TypeScript
-- [ ] Add Tailwind CSS + shadcn/ui; configure theme and base tokens
-- [ ] Add ESLint (Next + TS + React Hooks + Tailwind), Prettier (+ `prettier-plugin-tailwindcss`)
-- [ ] Add Vitest + RTL + Jest-DOM, Playwright (+ `@playwright/test`)
-- [ ] Add Socket.IO server dependency and client
-- [ ] Configure `pnpm` work scripts: `dev`, `build`, `lint`, `format:check`, `test`, `test:e2e`, `ci`
-- [ ] Docker & docker-compose for web, Postgres, Redis (optional)
-- [ ] GitHub Actions CI: install, Prisma migrate, lint, typecheck, unit/integration, e2e (smoke)
+- [x] Initialize Next.js App Router project with TypeScript
+- [x] Add Tailwind CSS; configure base theme tokens
+- [x] Add ESLint (Next + TS + React Hooks), Prettier (+ `prettier-plugin-tailwindcss`)
+- [x] Add Vitest + RTL + Jest-DOM, Playwright (+ `@playwright/test`)
+- [x] Add Socket.IO server dependency and client
+- [x] Configure npm scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `format`, `format:check`, `test`, `test:e2e`, `ci`
+- [x] Docker & docker-compose for web
+- [x] GitHub Actions CI: install, lint, typecheck, unit tests, build
+- [x] Add PostgreSQL to docker-compose.yml with persistent volume
+- [x] Add Prisma ORM dependency and configure DATABASE_URL
+- [ ] Create .env.local template with database connection string
+- [x] Add database setup instructions to README
+
 
 Deliverable: CI green on a hello route; homepage renders with Tailwind.
 
 ### 1. Data Model & Seeds (Prisma)
 
-- [ ] Define models in `prisma/schema.prisma`:
-  - [ ] `Event(id uuid @id, name String @unique)`
-  - [ ] `Feedback(id uuid @id, eventId uuid, rating Int, text String, createdAt DateTime @default(now()))`
-  - [ ] Optional `EventSummary(eventId uuid @id, summary String, updatedAt DateTime)`
+- [x] Define models in `prisma/schema.prisma`:
+  - [x] `Event(id uuid @id, name String @unique)`
+  - [x] `Feedback(id uuid @id, eventId uuid, rating Int, text String, createdAt DateTime @default(now()))`
+  - [x] Optional `EventSummary(eventId uuid @id, summary String, updatedAt DateTime)`
 - [ ] Add DB constraints (CHECK) for rating 1..5, text length 1..1000
-- [ ] Composite indexes for keyset (global newest/highest; per-event variants)
+- [x] Composite indexes for keyset (global newest/highest; per-event variants)
 - [ ] `prisma migrate dev` or `db push` for take-home
-- [ ] Seed script `prisma/seed.ts`: 4–6 events; 200–400 feedback rows over last 24–72h
-- [ ] README section with seeding instructions
+- [x] Seed script `prisma/seed.ts`: 4–6 events; 200–400 feedback rows over last 24–72h
+- [x] README section with seeding instructions
 - [ ] Spot-check with psql/Prisma queries
 
 Definition of done: Schema constraints enforced; seeds generated without errors.
@@ -329,5 +334,3 @@ Map components to visuals: controls bar (EventSelect, RatingSelect, SortToggle),
 - API matches PRD §9; pagination stable; realtime broadcasts on create
 - Frontend implements mocks with accessible components and smooth infinite scroll
 - Tests passing; CI green; README complete; security posture documented
-
-

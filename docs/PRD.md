@@ -9,6 +9,7 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 ## 2) Goals, Non-Goals & Success Indicators
 
 ### Goals
+
 - Clean, responsive, accessible UI for **anonymous** feedback.
 - **Realtime** global & per-event streams via **WebSockets (Socket.IO)**.
 - **Server-side** filtering (event, rating), sorting (newest/highest), **infinite scroll** with keyset pagination.
@@ -16,11 +17,13 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 - **Optional:** OpenAI per-event summary behind a feature flag.
 
 ### Non-Goals
+
 - Auth, profiles, moderation, spam/rate limiting.
 - Edit/delete feedback.
 - Multi-language (English-only).
 
 ### Success Indicators
+
 - Realtime updates across tabs within **~1–2s**.
 - Infinite scroll is smooth with **hundreds** of rows.
 - High test coverage (backend + frontend, BDD).
@@ -31,6 +34,7 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 ## 3) Personas & Primary Flow
 
 **Anonymous Visitor**
+
 - **Submit:** select event → text (1–1000 chars) → rating (1–5) → submit.
 - **Browse:** global feed by default; filter by event/rating; sort; infinite scroll.
 - **(Optional)** Read AI summary on event view.
@@ -50,6 +54,7 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 ## 5) Functional Requirements
 
 ### 5.1 Submission Form
+
 - **Fields:** `event_id` (dropdown), `text` (open), `rating` (1–5).
 - **Validations (server):**
   - `event_id` required & exists.
@@ -59,8 +64,9 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 - **UX:** optimistic insert; reconcile with server payload.
 
 ### 5.2 Feedback Stream
-- **Realtime transport:** WebSockets via Socket.IO.  
-  - Global room: `feedbacks`.  
+
+- **Realtime transport:** WebSockets via Socket.IO.
+  - Global room: `feedbacks`.
   - Per-event room: `event:<event_id>`.
 - **Broadcast on create:** payload schema in §10.
 - **Filters:** `event_id` (single), `rating` (single).
@@ -70,9 +76,11 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 - **Pagination:** **keyset** cursors (`cursor` opaque, `limit` default 20).
 
 ### 5.3 Events
+
 - **Seeded** list (name only). Exposed via API for dropdown/filters.
 
 ### 5.4 (Optional) AI Summaries
+
 - Input: latest **N=100** feedback texts for event.
 - Recompute: **debounce 5 min** after last change **or** every **K=10** new items (choose & document).
 - Store in DB; broadcast `summary.updated` on completion.
@@ -92,6 +100,7 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 ## 7) Information Architecture & UI
 
 ### Pages
+
 - **Home**
   - Sticky **Submission Form**.
   - **Filters:** EventSelect, RatingSelect.
@@ -103,6 +112,7 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
   - **Summary panel** (if enabled).
 
 ### Components
+
 `EventSelect`, `RatingSelect`, `SortToggle`, `FeedbackCard`, `InfiniteList`, `SubmitForm`.
 
 ---
@@ -110,10 +120,12 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 ## 8) Data Model & Constraints
 
 **Event**
+
 - `id: uuid (PK, NOT NULL)`
 - `name: string (unique, indexed, NOT NULL)`
 
 **Feedback**
+
 - `id: uuid (PK, NOT NULL)`
 - `event_id: uuid (FK → events.id, NOT NULL, indexed)`
 - `rating: integer (NOT NULL, CHECK 1..5, indexed)`
@@ -121,11 +133,13 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 - `created_at: timestamptz (NOT NULL, indexed)`
 
 **EventSummary (optional)**
+
 - `event_id: uuid (PK/FK, NOT NULL, unique)`
 - `summary: text (NOT NULL)`
 - `updated_at: timestamptz (NOT NULL)`
 
 **Indexes (keyset-aligned)**
+
 - Global newest: `(created_at DESC, id DESC)`
 - Global highest: `(rating DESC, created_at DESC, id DESC)`
 - Per-event newest: `(event_id, created_at DESC, id DESC)`
@@ -138,13 +152,17 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 All endpoints **versioned** under `/api/v1`. JSON. ISO8601/RFC3339 timestamps. Errors use HTTP semantics (422/404/400) with a consistent envelope.
 
 ### Events
+
 **GET `/api/v1/events` → 200**
+
 ```json
 [{ "id": "uuid", "name": "Workshop A" }]
 ```
 
 ### Feedbacks (global)
+
 **GET `/api/v1/feedbacks?event_id=&rating=&sort=newest|highest&cursor=&limit=20` → 200**
+
 ```json
 {
   "items": [
@@ -162,47 +180,59 @@ All endpoints **versioned** under `/api/v1`. JSON. ISO8601/RFC3339 timestamps. E
 ```
 
 **POST `/api/v1/feedbacks` → 201**
+
 ```json
 {
-  "id":"uuid","event_id":"uuid","event_name":"Workshop A",
-  "rating":5,"text":"Loved it!","created_at":"2025-08-18T15:34:12Z"
+  "id": "uuid",
+  "event_id": "uuid",
+  "event_name": "Workshop A",
+  "rating": 5,
+  "text": "Loved it!",
+  "created_at": "2025-08-18T15:34:12Z"
 }
 ```
 
 **422 (validation)**
+
 ```json
 {
   "error": {
-    "code":"validation_error",
-    "message":"Invalid parameters",
+    "code": "validation_error",
+    "message": "Invalid parameters",
     "details": { "rating": ["must be between 1 and 5"] }
   }
 }
 ```
 
 **400 (bad parameter shape)**
+
 ```json
-{ "error": { "code":"bad_request", "message":"Invalid cursor" } }
+{ "error": { "code": "bad_request", "message": "Invalid cursor" } }
 ```
 
 **404 (not found)**
+
 ```json
-{ "error": { "code":"not_found", "message":"Event not found" } }
+{ "error": { "code": "not_found", "message": "Event not found" } }
 ```
 
 ### Feedbacks (per-event)
+
 **GET `/api/v1/events/:event_id/feedbacks?rating=&sort=&cursor=&limit=` → 200**  
 Payload identical to global list; implicitly scoped by `:event_id`.
 
 ### Event Summary (optional singular subresource)
+
 **GET `/api/v1/events/:event_id/summary` → 200**
+
 ```json
 {
-  "event_id":"uuid",
-  "summary":"- Bullet 1\n- Bullet 2",
-  "updated_at":"2025-08-18T15:40:00Z"
+  "event_id": "uuid",
+  "summary": "- Bullet 1\n- Bullet 2",
+  "updated_at": "2025-08-18T15:40:00Z"
 }
 ```
+
 **404** if feature disabled or summary not available.
 
 ---
@@ -210,26 +240,34 @@ Payload identical to global list; implicitly scoped by `:event_id`.
 ## 10) Realtime (WebSockets via Socket.IO)
 
 **Namespaces/rooms**
+
 - Global room: `feedbacks`.
 - Per-event room: `event:<event_id>`.
 
 **Broadcast on create**
+
 ```json
 {
-  "type":"feedback.created",
-  "payload":{
-    "id":"…","event_id":"…","event_name":"Workshop A",
-    "rating":5,"text":"Loved it!","created_at":"2025-08-18T15:34:12Z"
+  "type": "feedback.created",
+  "payload": {
+    "id": "…",
+    "event_id": "…",
+    "event_name": "Workshop A",
+    "rating": 5,
+    "text": "Loved it!",
+    "created_at": "2025-08-18T15:34:12Z"
   }
 }
 ```
 
 **(Optional) Summary update**
+
 ```json
-{ "type":"summary.updated", "payload": { "event_id":"…", "summary":"…" } }
+{ "type": "summary.updated", "payload": { "event_id": "…", "summary": "…" } }
 ```
 
 **Client behavior**
+
 - `sort=newest`: **prepend** on arrival.
 - `sort=highest`: insert by `(rating desc, created_at desc, id desc)`.
 - Ignore items that don’t match current filters.
@@ -239,6 +277,7 @@ Payload identical to global list; implicitly scoped by `:event_id`.
 ## 11) Pagination Strategy
 
 **Keyset (cursor)**
+
 - `newest`: cursor = `{ created_at, id }`; query  
   `WHERE (created_at, id) < (?, ?) ORDER BY created_at DESC, id DESC LIMIT ?`
 - `highest`: cursor = `{ rating, created_at, id }`; query  
@@ -257,6 +296,7 @@ Payload identical to global list; implicitly scoped by `:event_id`.
 ## 13) Architecture & Stack
 
 **Monolith**
+
 - **Next.js 14 (App Router)** with **React** and **TypeScript**.
 - **Tailwind CSS + shadcn/ui**.
 - **Postgres** with **Prisma ORM**.
@@ -265,6 +305,7 @@ Payload identical to global list; implicitly scoped by `:event_id`.
 - **Docker + docker-compose** for Next.js, Postgres, Redis.
 
 **Directory Sketch**
+
 ```
 app/
   api/v1/events/route.ts               # GET (list events)
@@ -282,6 +323,7 @@ prisma/
 ```
 
 **Routes (Next.js file-based)**
+
 ```
 /api/v1/events                         → GET
 /api/v1/feedbacks                      → GET, POST
@@ -296,7 +338,7 @@ prisma/
 
 - **Prompt:** neutral, concise bullets: themes, sentiment, common positives/negatives, notable suggestions.
 - **Input:** latest **N=100** feedback texts.
-- **Policy:** choose **debounce 5 min** *or* **every K=10** new items; document choice.
+- **Policy:** choose **debounce 5 min** _or_ **every K=10** new items; document choice.
 - **Resilience:** feature-flagged; if key missing/errors → skip and log; UI hides panel or shows empty state.
 - **Broadcast:** `summary.updated` after save via Socket.IO.
 - **Storage:** full text in `event_summaries.summary`, `updated_at` tracked (via Prisma).
@@ -306,21 +348,27 @@ prisma/
 ## 15) Quality Plan (BDD) & CI
 
 **Server/API**
+
 - **Vitest**: request tests for route handlers (filters, sort, pagination, errors); socket emission tests; cursor helpers.
 
 **Frontend**
+
 - React components with **@testing-library/react** + **@testing-library/jest-dom**.
 
 **E2E**
+
 - **Playwright** for end-to-end happy path.
 
 **Coverage**
+
 - V8 coverage via Vitest.
 
 **Linters & Hooks**
+
 - ESLint (Next + TS + React Hooks + Tailwind) and Prettier (with Tailwind plugin).
 
 **CI (GitHub Actions)**
+
 - Jobs: `lint`, `typecheck`, `test`.
 - Services: Postgres, Redis.
 - Steps: checkout → setup Node → install deps → Prisma migrate → ESLint/Prettier check → Vitest → Playwright (optional/nightly).
@@ -358,35 +406,35 @@ prisma/
 
 ## 19) Manual QA Checklist
 
-- [ ] Valid feedback submission → optimistic insert → server reconcile.  
-- [ ] Validation errors shown (missing event, rating out of range, text too short/long).  
-- [ ] Global stream updates across two tabs in ~1–2s.  
-- [ ] Event view scoped correctly; new matching items live-insert.  
-- [ ] Filters + sort correctness; non-matching realtime items ignored.  
-- [ ] Infinite scroll loads additional pages; `next_cursor` null at end.  
-- [ ] XSS attempt is **escaped** on render; no script execution.  
-- [ ] Mobile layout & keyboard accessibility for stars.  
+- [ ] Valid feedback submission → optimistic insert → server reconcile.
+- [ ] Validation errors shown (missing event, rating out of range, text too short/long).
+- [ ] Global stream updates across two tabs in ~1–2s.
+- [ ] Event view scoped correctly; new matching items live-insert.
+- [ ] Filters + sort correctness; non-matching realtime items ignored.
+- [ ] Infinite scroll loads additional pages; `next_cursor` null at end.
+- [ ] XSS attempt is **escaped** on render; no script execution.
+- [ ] Mobile layout & keyboard accessibility for stars.
 - [ ] (Optional) Summary appears/updates; `summary.updated` broadcast handled.
 
 ---
 
 ## 20) Risks & Mitigations
 
-- **Unmoderated content:** out of scope; rely on escaping; note limitation.  
-- **Realtime flakiness:** degrade to polling last page and surface a banner.  
-- **Cursor bugs:** request specs + property-style tests for encode/decode & ordering.  
+- **Unmoderated content:** out of scope; rely on escaping; note limitation.
+- **Realtime flakiness:** degrade to polling last page and surface a banner.
+- **Cursor bugs:** request specs + property-style tests for encode/decode & ordering.
 - **OpenAI dependency (optional):** feature flag; debounce/coalesce; graceful failure.
 
 ---
 
 ## 21) Definition of Done
 
-1. **Skeleton up (Downhill starts):** CI green, Next.js page renders with Tailwind.  
-2. **Data + Seeds:** DB constraints proven; seed script done.  
-3. **List API w/ keyset:** curl demo of sorting & cursor progression.  
-4. **Submit + Broadcast:** 201 + WebSocket message; two-tab demo.  
-5. **Frontend UX:** Infinite scroll, filters/sort, optimistic insert, live updates.  
-6. **(Optional) Summaries:** Flag on; panel shows & updates.  
+1. **Skeleton up (Downhill starts):** CI green, Next.js page renders with Tailwind.
+2. **Data + Seeds:** DB constraints proven; seed script done.
+3. **List API w/ keyset:** curl demo of sorting & cursor progression.
+4. **Submit + Broadcast:** 201 + WebSocket message; two-tab demo.
+5. **Frontend UX:** Infinite scroll, filters/sort, optimistic insert, live updates.
+6. **(Optional) Summaries:** Flag on; panel shows & updates.
 7. **Hardening & README:** QA checklist passes; final polish.
 
 ---

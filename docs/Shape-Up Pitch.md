@@ -16,9 +16,9 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 
 - **Must fit in 1 build day.** I’ll ship a coherent vertical slice early, then layer features in slices.
 - **Cutline if time runs short (in order):**
-  1) Drop *Event View* page (keep global feed + filter by event).  
-  2) Keep WS realtime; if flaky, degrade to polling the first page every 5s and surface a “reconnecting” banner.  
-  3) Keep “highest” sort on the API but skip real-time *re-insertion* logic client-side (append and rely on refresh).
+  1. Drop _Event View_ page (keep global feed + filter by event).
+  2. Keep WS realtime; if flaky, degrade to polling the first page every 5s and surface a “reconnecting” banner.
+  3. Keep “highest” sort on the API but skip real-time _re-insertion_ logic client-side (append and rely on refresh).
 
 ---
 
@@ -79,6 +79,7 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 ## 6) Scopes
 
 ### Scope A — Project Skeleton & CI (Downhill)
+
 - Next.js app (App Router), Postgres, Redis, Socket.IO server endpoint.
 - Tailwind + shadcn/ui.
 - Docker compose: `web` (Next.js), `db` (Postgres), `redis`.
@@ -89,6 +90,7 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 ---
 
 ### Scope B — Data Model & Seeds (Steep → Downhill)
+
 - Prisma schema + constraints:
   - `Event(id uuid @id, name String @unique)`
   - `Feedback(id uuid @id, eventId uuid, rating Int, text String, createdAt DateTime @default(now()))`
@@ -101,6 +103,7 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 ---
 
 ### Scope C — Listing API + Keyset (Steep)
+
 - `GET /api/v1/events` (for dropdown).
 - `GET /api/v1/feedbacks` with filters: `event_id?`, `rating?`, `sort=newest|highest`, `cursor?`, `limit<=50`.
 - `GET /api/v1/events/:event_id/feedbacks` (same envelope).
@@ -112,6 +115,7 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 ---
 
 ### Scope D — Submission + Broadcast (Steep)
+
 - `POST /api/v1/feedbacks` validations (existence, bounds, trimming, escape on render).
 - Broadcast payload per PRD §10 to global and event rooms via Socket.IO.
 - Room param whitelist/validation.
@@ -121,18 +125,20 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 ---
 
 ### Scope E — Frontend UX (Downhill)
+
 - Components: `EventSelect`, `RatingSelect`, `SortToggle`, `SubmitForm`, `FeedbackCard`, `InfiniteList`.
 - Infinite scroll (IntersectionObserver) calling list API with cursor.
 - Optimistic insert: render pending row with “sending…”; reconcile with server on 201.
 - Realtime client: subscribe to `"feedbacks"` and (if filtered) `"event:<id>"`; ignore mismatched items; insertion policy:
   - **Newest:** prepend.
-  - **Highest:** insert by `(rating desc, created_at desc, id desc)` *or* (cutline) append + refresh on interval.
+  - **Highest:** insert by `(rating desc, created_at desc, id desc)` _or_ (cutline) append + refresh on interval.
 
 **Demo:** Smooth scroll, filters, sort toggle, live updates.
 
 ---
 
 ### Scope F — (Optional) Summaries (Downhill)
+
 - Feature flag `FEATURE_SUMMARIES=true`.
 - `GET /api/v1/events/:event_id/summary`.
 - Background job: coalesce per event; recompute on cadence; broadcast `summary.updated`.
@@ -189,49 +195,49 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 
 ## 10) Milestones / Demos (hill chart checkpoints)
 
-1. **Skeleton up (Downhill starts):** CI green, Next.js page renders with Tailwind.  
-2. **Data + Seeds:** DB constraints proven; seed script done.  
-3. **List API w/ keyset:** curl demo of sorting & cursor progression.  
-4. **Submit + Broadcast:** 201 + WebSocket message; two-tab demo.  
-5. **Frontend UX:** Infinite scroll, filters/sort, optimistic insert, live updates.  
-6. **(Optional) Summaries:** Flag on; panel shows & updates.  
+1. **Skeleton up (Downhill starts):** CI green, Next.js page renders with Tailwind.
+2. **Data + Seeds:** DB constraints proven; seed script done.
+3. **List API w/ keyset:** curl demo of sorting & cursor progression.
+4. **Submit + Broadcast:** 201 + WebSocket message; two-tab demo.
+5. **Frontend UX:** Infinite scroll, filters/sort, optimistic insert, live updates.
+6. **(Optional) Summaries:** Flag on; panel shows & updates.
 7. **Hardening & README:** QA checklist passes; final polish.
 
 ---
 
 ## 11) Deliverables (Definition of Done, concrete)
 
-- Running app (Docker or `pnpm dev`) with README (env vars, seeds, feature flags, local URLs).  
-- REST API as in PRD (§9), passing request specs.  
-- Realtime demo with two tabs (~1–2s).  
-- Infinite scroll (keyset) smooth for a few hundred rows.  
-- CI green: ESLint/Prettier, Typecheck, Vitest.  
-- Security posture documented (same-origin + CORS/CSRF stance).  
+- Running app (Docker or `pnpm dev`) with README (env vars, seeds, feature flags, local URLs).
+- REST API as in PRD (§9), passing request specs.
+- Realtime demo with two tabs (~1–2s).
+- Infinite scroll (keyset) smooth for a few hundred rows.
+- CI green: ESLint/Prettier, Typecheck, Vitest.
+- Security posture documented (same-origin + CORS/CSRF stance).
 - (Optional) Summaries behind `FEATURE_SUMMARIES`.
 
 ---
 
 ## 12) README Outline (to include in repo)
 
-- **Overview** & PRD link/summary  
-- **Stack**: Next.js 14 (App Router), React, TypeScript, Tailwind, Postgres, Prisma, Redis, Socket.IO  
-- **Run locally**: `docker compose up` or `pnpm install && pnpm dev`  
-- **Env vars**: (from PRD §22)  
-- **Seeding**: `prisma db push && prisma db seed`  
-- **API docs**: endpoints & example payloads  
-- **Realtime**: rooms and expected messages  
-- **Testing**: `pnpm test` (Vitest) and `pnpm test:e2e` (Playwright)  
-- **Feature flags**: `FEATURE_SUMMARIES`  
-- **Security**: CSRF/CORS choice  
+- **Overview** & PRD link/summary
+- **Stack**: Next.js 14 (App Router), React, TypeScript, Tailwind, Postgres, Prisma, Redis, Socket.IO
+- **Run locally**: `docker compose up` or `pnpm install && pnpm dev`
+- **Env vars**: (from PRD §22)
+- **Seeding**: `prisma db push && prisma db seed`
+- **API docs**: endpoints & example payloads
+- **Realtime**: rooms and expected messages
+- **Testing**: `pnpm test` (Vitest) and `pnpm test:e2e` (Playwright)
+- **Feature flags**: `FEATURE_SUMMARIES`
+- **Security**: CSRF/CORS choice
 - **Notes**: Cutlines, known limitations
 
 ---
 
 ## 13) What “Good” Looks Like (hiring signals)
 
-- Small, sharp vertical slices landing end-to-end early.  
-- Clean, idiomatic Next.js route handlers and Prisma queries; input validation at the boundary; lean queries.  
-- Deterministic keyset pagination backed by correct composite indexes.  
-- Accessible, responsive UI with clear state handling (optimistic insert/reconcile).  
-- Tests that read like specs, not just coverage games.  
+- Small, sharp vertical slices landing end-to-end early.
+- Clean, idiomatic Next.js route handlers and Prisma queries; input validation at the boundary; lean queries.
+- Deterministic keyset pagination backed by correct composite indexes.
+- Accessible, responsive UI with clear state handling (optimistic insert/reconcile).
+- Tests that read like specs, not just coverage games.
 - README that lets a reviewer run the app in minutes.
