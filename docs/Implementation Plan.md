@@ -99,7 +99,6 @@ prisma/
 - [x] Create .env.local template with database connection string
 - [x] Add database setup instructions to README
 
-
 Deliverable: CI green on a hello route; homepage renders with Tailwind.
 
 ### 1. Data Model & Seeds (Prisma)
@@ -119,19 +118,19 @@ Definition of done: Schema constraints enforced; seeds generated without errors.
 
 ### 2. Shared Libraries (lib)
 
-- [ ] `lib/cursor.ts`: encode/decode opaque base64url(JSON) cursor `{ v: 1, sort, k: [...] }`
-- [ ] `lib/queries/feedbacks.ts`: composable Prisma queries for list endpoints using keyset tuples
-- [ ] `lib/validation.ts`: Zod schemas for request params and bodies
-- [ ] `lib/responses.ts`: typed success and error envelopes (400/404/422)
-- [ ] `lib/realtime.ts`: Socket.IO server helpers (rooms, emit helpers, CORS guard)
+- [x] `lib/cursor.ts`: encode/decode opaque base64url(JSON) cursor `{ v: 1, sort, k: [...] }`
+- [x] `lib/queries/feedbacks.ts`: composable Prisma queries for list endpoints using keyset tuples
+- [x] `lib/validation.ts`: Zod schemas for request params and bodies
+- [x] `lib/responses.ts`: typed success and error envelopes (400/404/422)
+- [x] `lib/realtime.ts`: Socket.IO server helpers (rooms, emit helpers, CORS guard)
 
 Lightweight Clean Architecture layers (80/20):
 
-- [ ] Domain (`domain/`): define `Event` and `Feedback` entities and core invariants.
-- [ ] Application Ports (`application/ports/`): `EventRepository`, `FeedbackRepository`, `RealtimePublisher`, `SummaryService`.
-- [ ] Application Use Cases (`application/usecases/`): `listFeedbacks` (filters/sort/cursor), `createFeedback` (validation, persist, emit realtime).
-- [ ] Infrastructure Repositories (`infrastructure/repositories/prisma/`): Prisma-backed implementations of ports; support transactions.
-- [ ] Infrastructure Realtime (`infrastructure/realtime/`): Socket.IO publisher implementing `RealtimePublisher`.
+- [x] Domain (`domain/`): define `Event` and `Feedback` entities and core invariants.
+- [x] Application Ports (`application/ports/`): `EventRepository`, `FeedbackRepository`, `RealtimePublisher`, `SummaryService`.
+- [x] Application Use Cases (`application/usecases/`): `listFeedbacks` (filters/sort/cursor), `createFeedback` (validation, persist, emit realtime).
+- [x] Infrastructure Repositories (`infrastructure/repositories/prisma/`): Prisma-backed implementations of ports; support transactions.
+- [x] Infrastructure Realtime (`infrastructure/realtime/`): Socket.IO publisher implementing `RealtimePublisher`.
 - [ ] Optional Infrastructure AI (`infrastructure/ai/`): summary service implementing `SummaryService`.
 
 ### 3. API Endpoints (`/api/v1`)
