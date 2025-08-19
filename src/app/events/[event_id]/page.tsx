@@ -2,9 +2,10 @@ import { fetchEvents, fetchEventSummary } from '@/lib/api';
 import { SubmitForm } from '@/components/SubmitForm';
 import { Stream } from '@/components/Stream';
 
-export default async function EventPage({ params }: { params: { event_id: string } }) {
+export default async function EventPage({ params }: { params: Promise<{ event_id: string }> }) {
   const events = await fetchEvents();
-  const selected = events.find((e) => e.id === params.event_id);
+  const { event_id } = await params;
+  const selected = events.find((e) => e.id === event_id);
   const summariesEnabled = process.env.FEATURE_SUMMARIES === 'true';
   let summary: string | null = null;
   if (summariesEnabled && selected) {
@@ -36,7 +37,7 @@ export default async function EventPage({ params }: { params: { event_id: string
         </aside>
         <main>
           <div className="mb-2 text-sm font-medium">Event Feedback</div>
-          <Stream events={events} fixedEventId={params.event_id} />
+          <Stream events={events} fixedEventId={event_id} />
         </main>
       </div>
     </div>

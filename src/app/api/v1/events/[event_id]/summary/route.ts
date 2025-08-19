@@ -8,14 +8,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   _request: Request,
-  context: { params: { event_id: string } },
+  context: { params: Promise<{ event_id: string }> },
 ) {
   try {
     if (process.env.FEATURE_SUMMARIES !== 'true') {
       return NextResponse.json(notFound('Summaries feature is disabled'), { status: 404 });
     }
 
-    const { event_id } = context.params;
+    const { event_id } = await context.params;
     if (!event_id) {
       return NextResponse.json(badRequest('Missing event_id'), { status: 400 });
     }

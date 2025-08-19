@@ -15,15 +15,33 @@ export function setServerIO(io: IOServer): void {
 }
 
 function getAllowedOrigins(): string[] | string {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || '';
-  try {
-    const url = new URL(appUrl);
-    const base = `${url.protocol}//${url.host}`;
-    return [base];
-  } catch {
-    // Fallback: allow all origins (dev). Consider setting NEXT_PUBLIC_APP_URL in production.
-    return '*';
-  }
+  const configured = process.env.ALLOWED_ORIGINS || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || '';
+  const parseToOrigin = (value: string): string | null => {
+    try {
+      const url = new URL(value);
+      return `${url.protocol}//${url.host}`;
+    } catch {
+      return null;
+    }
+  };
+
+  const origins = configured
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean)
+    .map(parseToOrigin)
+    .filter((x): x is string => Boolean(x));
+
+  if (origins.length > 0) return origins;
+
+  // In development, be permissive to reduce setup friction.
+  if (process.env.NODE_ENV !== 'production') return '*';
+
+  // In production, require explicit configuration to avoid permissive CORS.
+  // Throwing here makes the misconfiguration visible early.
+  throw new Error(
+    'Socket.IO CORS misconfigured: set ALLOWED_ORIGINS (comma-separated URLs) or NEXT_PUBLIC_APP_URL in the environment.',
+  );
 }
 
 function getSocketPath(): string {
