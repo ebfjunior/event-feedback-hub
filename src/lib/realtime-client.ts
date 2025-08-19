@@ -10,8 +10,13 @@ let socketSingleton: ConnectedSocket | null = null;
 function getBaseUrl(): string {
 	const env = process.env.NEXT_PUBLIC_SOCKET_URL;
 	if (env) return env;
-	if (typeof window !== 'undefined') return window.location.origin;
-	return 'http://localhost:3000';
+	if (typeof window !== 'undefined') {
+		const isLocalDev =
+			(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
+			window.location.port === '3000';
+		return isLocalDev ? 'http://localhost:3101' : window.location.origin;
+	}
+	return 'http://localhost:3101';
 }
 
 export function getClientSocket(): ConnectedSocket {

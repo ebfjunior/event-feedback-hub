@@ -7,7 +7,7 @@ import { badRequest, notFound, ok, serverError, unprocessable } from '@/lib/resp
 import { listFeedbacks } from '@/application/usecases/listFeedbacks';
 import { createFeedback } from '@/application/usecases/createFeedback';
 import { SocketRealtimePublisher } from '@/infrastructure/realtime/socketPublisher';
-import { getServerIO } from '@/infrastructure/realtime/server';
+import { ensureSocketIOServerStarted, getServerIO } from '@/infrastructure/realtime/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,6 +71,7 @@ export async function POST(request: Request) {
     }
 
     const feedbackRepo = new FeedbackRepositoryPrisma(prisma);
+    ensureSocketIOServerStarted();
     const publisher = new SocketRealtimePublisher(getServerIO());
     const created = await createFeedback(feedbackRepo, publisher, {
       eventId: event_id,
