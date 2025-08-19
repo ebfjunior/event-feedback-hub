@@ -211,11 +211,16 @@ Tests:
 
 ### 7. Hardening, QA, and Docs
 
-- [ ] Security posture documented: same-origin app, no auth/cookies; CORS and CSRF rationale
-- [ ] Socket.IO allowed origins locked down in prod
+- [x] Security posture documented: same-origin app, no auth/cookies; CORS and CORS rationale
+- [x] Socket.IO allowed origins locked down in prod
 - [ ] API logs and error handling polished
-- [ ] README with run instructions, env vars, seeds, API docs, realtime, tests, flags
+- [x] README with run instructions, env vars, seeds, API docs, realtime, tests, flags
 - [ ] Manual QA checklist (from PRD §19) executed
+
+Notes (Step 7):
+- Introduced `ALLOWED_ORIGINS` (comma-separated) for Socket.IO CORS. In production, explicit origins are required; dev defaults to `*` for convenience.
+- Documented security posture and manual QA checklist in `README.md`.
+- Fixed Next.js 15 dynamic route warnings by awaiting `params` in event page and summary API.
 
 ---
 
@@ -291,6 +296,10 @@ OPENAI_API_KEY=...
 DATABASE_URL=...
 REDIS_URL=redis://redis:6379/0
 NEXT_PUBLIC_SOCKET_URL=ws://localhost:3000
+# App base URL (used for links)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Socket.IO allowed origins (protocol + host, comma-separated for multiple). Required in prod.
+ALLOWED_ORIGINS=http://localhost:3000
 ```
 
 ---
