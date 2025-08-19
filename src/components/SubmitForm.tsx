@@ -17,7 +17,6 @@ const FormSchema = z.object({
   event_id: z.string().uuid({ message: 'Choose an event' }),
   rating: z.number().min(1).max(5),
   text: z.string().min(1).max(1000),
-  anonymous: z.boolean().default(true),
 });
 
 export type SubmitFormProps = {
@@ -31,7 +30,7 @@ export function SubmitForm({ events, onCreated, className }: SubmitFormProps) {
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const { register, handleSubmit, setValue, watch, formState, reset } = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { rating: 5, text: '', anonymous: true },
+    defaultValues: { rating: 5, text: '' },
   });
   const rating = watch('rating');
 
@@ -40,7 +39,7 @@ export function SubmitForm({ events, onCreated, className }: SubmitFormProps) {
     try {
       const created = await createFeedback({ event_id: values.event_id, rating: values.rating, text: values.text });
       onCreated?.(created);
-      reset({ rating: 5, text: '', anonymous: true, event_id: values.event_id });
+      reset({ rating: 5, text: '', event_id: values.event_id });
     } finally {
       setIsSubmitting(false);
     }
