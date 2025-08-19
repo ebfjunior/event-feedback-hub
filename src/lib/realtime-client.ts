@@ -3,32 +3,32 @@
 import { io, type Socket } from 'socket.io-client';
 import type { Room } from './realtime';
 
-type ConnectedSocket = Socket<never, never>;
+type ConnectedSocket = Socket<Record<string, unknown>, { join: (room: Room) => void; leave: (room: Room) => void }>;
 
 let socketSingleton: ConnectedSocket | null = null;
 
 function getBaseUrl(): string {
-  const env = process.env.NEXT_PUBLIC_SOCKET_URL;
-  if (env) return env;
-  if (typeof window !== 'undefined') return window.location.origin;
-  return 'http://localhost:3000';
+	const env = process.env.NEXT_PUBLIC_SOCKET_URL;
+	if (env) return env;
+	if (typeof window !== 'undefined') return window.location.origin;
+	return 'http://localhost:3000';
 }
 
 export function getClientSocket(): ConnectedSocket {
-  if (!socketSingleton) {
-    socketSingleton = io(getBaseUrl(), { path: '/api/socket' });
-  }
-  return socketSingleton;
+	if (!socketSingleton) {
+		socketSingleton = io(getBaseUrl(), { path: '/api/socket' }) as ConnectedSocket;
+	}
+	return socketSingleton;
 }
 
 export function subscribeToRoom(room: Room): void {
-  const socket = getClientSocket();
-  socket.emit('join', room);
+	const socket = getClientSocket();
+	socket.emit('join', room);
 }
 
 export function unsubscribeFromRoom(room: Room): void {
-  const socket = getClientSocket();
-  socket.emit('leave', room);
+	const socket = getClientSocket();
+	socket.emit('leave', room);
 }
 
 

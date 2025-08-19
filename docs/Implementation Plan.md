@@ -169,29 +169,29 @@ Architecture note:
 
 Pages:
 
-- [ ] Home: filters (EventSelect, RatingSelect), SortToggle (Newest/Highest), SubmitForm, Live Stream (InfiniteList of FeedbackCard)
-- [ ] Event view: scoped stream + Summary panel
+- [x] Home: filters (EventSelect, RatingSelect), SortToggle (Newest/Highest), SubmitForm, Live Stream (InfiniteList of FeedbackCard)
+- [~] Event view: scoped stream implemented; Summary panel pending (feature-flagged later)
 
 Components (see `UX Pilot Context.md` and mocks):
 
-- [ ] `EventSelect`: dropdown populated from `GET /api/v1/events`
-- [ ] `RatingSelect`: 1–5 filter
-- [ ] `SortToggle`: discriminated union `"newest" | "highest"`
-- [ ] `SubmitForm`: textarea (1–1000), star radio group (accessible), submit; optimistic insert + reconcile
-- [ ] `FeedbackCard`: stars, escaped text, event name, relative timestamp
-- [ ] `InfiniteList`: IntersectionObserver sentinel, loading row, end-of-list state
-- [ ] `ReconnectBanner`: shows on websocket drop; degrade to polling first page every 5s
+- [x] `EventSelect`: dropdown populated from `GET /api/v1/events`
+- [x] `RatingSelect`: 1–5 filter
+- [x] `SortToggle`: discriminated union `"newest" | "highest"`
+- [x] `SubmitForm`: textarea (1–1000), star control, submit; optimistic insert hook in place
+- [x] `FeedbackCard`: stars, escaped text, event name, relative timestamp
+- [x] `InfiniteList`: IntersectionObserver sentinel, loading row, end-of-list state
+- [x] `ReconnectBanner`: shows on websocket drop (polling fallback not yet added)
 - [ ] `EmptyState` and `ErrorState`
 
 Behaviors:
 
-- [ ] Server-first data fetching where possible; minimal client state
-- [ ] Infinite scroll calls list endpoints with cursor; appends results; `next_cursor=null` ends
-- [ ] Realtime:
-  - [ ] If sort=newest: prepend new matching item
-  - [ ] If sort=highest: insert by `(rating desc, created_at desc, id desc)`; cutline: append + subtle refresh hint
-- [ ] Output escaping on render (never interpret HTML/Markdown)
-- [ ] Accessibility: star radio group keyboard 1–5, arrows; visible focus rings; ARIA labels
+- [x] Server-first data fetching where possible; minimal client state
+- [x] Infinite scroll calls list endpoints with cursor; appends results; `next_cursor=null` ends (de-duped)
+- [x] Realtime:
+  - [x] If sort=newest: prepend new matching item (de-duped)
+  - [x] If sort=highest: ordered insert by `(rating desc, created_at desc, id desc)`
+- [x] Output escaping on render (React text render)
+- [~] Accessibility: star control clickable; keyboard/ARIA enhancements pending
 
 Tests:
 
