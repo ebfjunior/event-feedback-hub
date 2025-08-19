@@ -1,6 +1,9 @@
 import { Star } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { FeedbackItem } from '@/types/api';
+import { Card, CardContent, CardDescription, CardHeader, CardAction } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export type FeedbackCardProps = {
   feedback: FeedbackItem;
@@ -28,16 +31,22 @@ export function FeedbackCard({ feedback, highlight }: FeedbackCardProps) {
   const rtf = diffMin < 60 ? timeAgo.format(-diffMin, 'minute') : timeAgo.format(-Math.round(diffMin / 60), 'hour');
 
   return (
-    <div className={cn('rounded-md border bg-card/60 p-3 shadow-sm', highlight && 'ring-1 ring-yellow-400')}> 
-      <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
-        <div className="truncate font-medium text-primary/80">{feedback.event_name}</div>
-        <div>{rtf}</div>
-      </div>
-      <div className="mb-2 text-sm text-foreground/90">{feedback.text}</div>
-      <div className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">Anonymous</div>
-        <Stars rating={feedback.rating} />
-      </div>
-    </div>
+    <Card className={cn('bg-card/60 shadow-sm', highlight && 'ring-1 ring-yellow-400')}> 
+      <CardHeader className="gap-1.5">
+        <Badge asChild variant="secondary" className="truncate max-w-full">
+          <Link href={`/events/${feedback.event_id}`} aria-label={`Open event ${feedback.event_name}`}>
+            {feedback.event_name}
+          </Link>
+        </Badge>
+        <CardDescription className="text-xs">{rtf}</CardDescription>
+        <CardAction>
+          <Stars rating={feedback.rating} />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="text-sm text-foreground/90">{feedback.text}</div>
+        <div className="mt-3 text-xs text-muted-foreground">Anonymous</div>
+      </CardContent>
+    </Card>
   );
 }
