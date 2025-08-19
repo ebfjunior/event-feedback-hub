@@ -25,3 +25,5 @@ export function RatingSelect({ value, onChange }: RatingSelectProps) {
     </Select>
   );
 }
+
+

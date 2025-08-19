@@ -19,13 +19,13 @@ const FormSchema = z.object({
   text: z.string().min(1).max(1000),
 });
 
-export type SubmitFormProps = {
+export type SubmitFeedbackFormProps = {
   events: EventListItem[];
   onCreated?: (feedback: { id: string; event_id: string; event_name: string; rating: number; text: string; created_at: string }) => void;
   className?: string;
 };
 
-export function SubmitForm({ events, onCreated, className }: SubmitFormProps) {
+export function SubmitFeedbackForm({ events, onCreated, className }: SubmitFeedbackFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const { register, handleSubmit, setValue, watch, formState, reset } = useForm<z.infer<typeof FormSchema>>({
@@ -102,3 +102,5 @@ export function SubmitForm({ events, onCreated, className }: SubmitFormProps) {
     </form>
   );
 }
+
+

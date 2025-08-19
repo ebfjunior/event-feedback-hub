@@ -1,27 +1,14 @@
-import { Star } from 'lucide-react';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
 import type { FeedbackItem } from '@/types/api';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardAction } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Stars } from '@/components/atoms/Stars';
 
 export type FeedbackCardProps = {
   feedback: FeedbackItem;
   highlight?: boolean;
 };
-
-function Stars({ rating }: { rating: number }) {
-  return (
-    <div className="flex items-center gap-1" aria-label={`${rating} out of 5 stars`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={cn('h-4 w-4', i < rating ? 'fill-yellow-400 stroke-yellow-400' : 'stroke-muted-foreground')}
-        />
-      ))}
-    </div>
-  );
-}
 
 export function FeedbackCard({ feedback, highlight }: FeedbackCardProps) {
   const created = new Date(feedback.created_at);
@@ -31,7 +18,7 @@ export function FeedbackCard({ feedback, highlight }: FeedbackCardProps) {
   const rtf = diffMin < 60 ? timeAgo.format(-diffMin, 'minute') : timeAgo.format(-Math.round(diffMin / 60), 'hour');
 
   return (
-    <Card className={cn('bg-card/60 shadow-sm', highlight && 'ring-1 ring-yellow-400')}> 
+    <Card className={cn('bg-card/60 shadow-sm', highlight && 'ring-1 ring-yellow-400')}>
       <CardHeader className="gap-1.5">
         <Badge asChild variant="secondary" className="truncate max-w-full">
           <Link href={`/events/${feedback.event_id}`} aria-label={`Open event ${feedback.event_name}`}>
@@ -50,3 +37,5 @@ export function FeedbackCard({ feedback, highlight }: FeedbackCardProps) {
     </Card>
   );
 }
+
+
