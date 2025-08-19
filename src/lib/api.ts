@@ -45,3 +45,10 @@ export async function createFeedback(body: { event_id: string; rating: number; t
   const json = await handle<SuccessEnvelope<FeedbackItem>>(res);
   return json.data;
 }
+
+export async function fetchEventSummary(eventId: string): Promise<{ event_id: string; summary: string }> {
+  const url = new URL(`/api/v1/events/${eventId}/summary`, typeof window === 'undefined' ? 'http://localhost:3000' : window.location.origin);
+  const res = await fetch(url.toString(), { cache: 'no-store' });
+  const json = await handle<SuccessEnvelope<{ event_id: string; summary: string }>>(res);
+  return json.data;
+}
