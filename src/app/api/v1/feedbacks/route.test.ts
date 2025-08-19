@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { NextResponse } from 'next/server';
-import { EventRepositoryPrisma } from '@/infrastructure/repositories/prisma/EventRepositoryPrisma';
+import { EventRepositoryPrisma } from '@/repositories/prisma/EventRepositoryPrisma';
 
-vi.mock('@/application/usecases/listFeedbacks', () => ({
+vi.mock('@/usecases/listFeedbacks', () => ({
   listFeedbacks: vi.fn(),
 }));
 
-vi.mock('@/application/usecases/createFeedback', () => ({
+vi.mock('@/usecases/createFeedback', () => ({
   createFeedback: vi.fn(),
 }));
 
@@ -38,7 +38,7 @@ describe('api/v1/feedbacks route', () => {
   });
 
   it('GET returns mapped items and next_cursor on success', async () => {
-    const { listFeedbacks } = await import('@/application/usecases/listFeedbacks');
+    const { listFeedbacks } = await import('@/usecases/listFeedbacks');
     vi.mocked(listFeedbacks).mockResolvedValueOnce({
       items: [
         {
@@ -126,7 +126,7 @@ describe('api/v1/feedbacks route', () => {
 
   it('POST creates feedback and returns mapped data', async () => {
     const { POST } = await import('./route');
-    const { createFeedback } = await import('@/application/usecases/createFeedback');
+    const { createFeedback } = await import('@/usecases/createFeedback');
     vi.spyOn(EventRepositoryPrisma.prototype, 'getNameById').mockResolvedValueOnce('My Event');
     vi.mocked(createFeedback).mockResolvedValueOnce({
       id: 'f1',

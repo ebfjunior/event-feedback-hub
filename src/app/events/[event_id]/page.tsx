@@ -1,7 +1,7 @@
 import { fetchEvents, fetchEventSummary } from '@/lib/api';
-import { SubmitForm } from '@/components/SubmitForm';
-import { Stream } from '@/components/Stream';
-import { AISummaryCard } from '@/components/AISummaryCard';
+import { SubmitFeedbackForm } from '@/components/organisms/SubmitFeedbackForm';
+import { FeedbackStream } from '@/components/organisms/FeedbackStream';
+import { AISummaryCard } from '@/components/organisms/AISummaryCard';
 
 export default async function EventPage({ params }: { params: Promise<{ event_id: string }> }) {
   const events = await fetchEvents();
@@ -29,11 +29,11 @@ export default async function EventPage({ params }: { params: Promise<{ event_id
       <div className="grid gap-6 md:grid-cols-[320px_1fr]">
         <aside className="space-y-6">
           {summariesEnabled && selected && <AISummaryCard summary={summary} />}
-          <SubmitForm events={events} />
+          <SubmitFeedbackForm events={events} />
         </aside>
         <main>
           <div className="mb-2 text-sm font-medium">Event Feedback</div>
-          <Stream events={events} fixedEventId={event_id} />
+          <FeedbackStream events={events} fixedEventId={event_id} />
         </main>
       </div>
     </div>

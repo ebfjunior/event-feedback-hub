@@ -1,4 +1,4 @@
-import type { SummaryService, EventSummary } from '@/application/ports/SummaryService';
+import type { SummaryService, EventSummary } from '@/types/SummaryService';
 import type { PrismaClient } from '@prisma/client';
 import type { ChatClient } from '@/infrastructure/ai/openaiClient';
 import { OpenAIChatClient } from '@/infrastructure/ai/openaiClient';

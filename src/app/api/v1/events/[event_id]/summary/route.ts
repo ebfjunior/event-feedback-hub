@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/infrastructure/prisma';
-import { EventRepositoryPrisma } from '@/infrastructure/repositories/prisma/EventRepositoryPrisma';
+import { EventRepositoryPrisma } from '@/repositories/prisma/EventRepositoryPrisma';
 import { ok, notFound, serverError, badRequest } from '@/lib/responses';
 import { OpenAISummaryService } from '@/infrastructure/ai/openaiSummaryService';
 

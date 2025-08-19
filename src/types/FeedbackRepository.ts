@@ -26,3 +26,5 @@ export interface FeedbackRepository {
   list(params: ListFeedbacksParams): Promise<ListFeedbacksResult>;
   create(data: { eventId: string; rating: number; text: string }): Promise<FeedbackListItem>;
 }
+
+

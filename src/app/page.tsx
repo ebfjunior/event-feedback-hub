@@ -1,6 +1,6 @@
 import { fetchEvents } from '@/lib/api';
-import { SubmitForm } from '@/components/SubmitForm';
-import { Stream } from '@/components/Stream';
+import { SubmitFeedbackForm } from '@/components/organisms/SubmitFeedbackForm';
+import { FeedbackStream } from '@/components/organisms/FeedbackStream';
 
 export default async function Home() {
   const events = await fetchEvents();
@@ -13,11 +13,11 @@ export default async function Home() {
 
       <div className="grid gap-6 md:grid-cols-[320px_1fr]">
         <aside>
-          <SubmitForm events={events} />
+          <SubmitFeedbackForm events={events} />
         </aside>
         <main>
           <div className="mb-2 text-sm font-medium">Live Feedback Stream</div>
-          <Stream events={events} />
+          <FeedbackStream events={events} />
         </main>
       </div>
 

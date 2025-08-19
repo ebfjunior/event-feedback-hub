@@ -7,3 +7,5 @@ export type EventSummary = {
 export interface SummaryService {
   computeSummaryForEvent(eventId: string): Promise<EventSummary>;
 }
+
+

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextResponse } from 'next/server';
-import { EventRepositoryPrisma } from '@/infrastructure/repositories/prisma/EventRepositoryPrisma';
+import { EventRepositoryPrisma } from '@/repositories/prisma/EventRepositoryPrisma';
 
 function jsonResponseBody(res: NextResponse) {
   return (res as unknown as Response).json();

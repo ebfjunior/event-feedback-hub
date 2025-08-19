@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ok, serverError } from '@/lib/responses';
 import { prisma } from '@/infrastructure/prisma';
-import { EventRepositoryPrisma } from '@/infrastructure/repositories/prisma/EventRepositoryPrisma';
+import { EventRepositoryPrisma } from '@/repositories/prisma/EventRepositoryPrisma';
 
 export const dynamic = 'force-dynamic';
 

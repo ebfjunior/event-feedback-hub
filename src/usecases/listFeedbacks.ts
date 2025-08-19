@@ -2,7 +2,7 @@ import type {
   FeedbackRepository,
   ListFeedbacksParams,
   ListFeedbacksResult,
-} from '../ports/FeedbackRepository';
+} from '@/types/FeedbackRepository';
 
 export async function listFeedbacks(
   repo: FeedbackRepository,
@@ -10,3 +10,5 @@ export async function listFeedbacks(
 ): Promise<ListFeedbacksResult> {
   return repo.list(params);
 }
+
+

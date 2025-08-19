@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/infrastructure/prisma';
-import { FeedbackRepositoryPrisma } from '@/infrastructure/repositories/prisma/FeedbackRepositoryPrisma';
-import { EventRepositoryPrisma } from '@/infrastructure/repositories/prisma/EventRepositoryPrisma';
+import { FeedbackRepositoryPrisma } from '@/repositories/prisma/FeedbackRepositoryPrisma';
+import { EventRepositoryPrisma } from '@/repositories/prisma/EventRepositoryPrisma';
 import { ListFeedbacksQuerySchema, CreateFeedbackBodySchema } from '@/lib/validation';
 import { badRequest, notFound, ok, serverError, unprocessable } from '@/lib/responses';
-import { listFeedbacks } from '@/application/usecases/listFeedbacks';
-import { createFeedback } from '@/application/usecases/createFeedback';
+import { listFeedbacks } from '@/usecases/listFeedbacks';
+import { createFeedback } from '@/usecases/createFeedback';
 
 export const dynamic = 'force-dynamic';
 
