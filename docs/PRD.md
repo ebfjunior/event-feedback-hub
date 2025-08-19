@@ -11,7 +11,7 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 ### Goals
 
 - Clean, responsive, accessible UI for **anonymous** feedback.
-- **Realtime** global & per-event streams via **WebSockets (Socket.IO)**.
+- Near–real time streams via periodic polling (no WebSockets).
 - **Server-side** filtering (event, rating), sorting (newest/highest), **infinite scroll** with keyset pagination.
 - Solid code quality: **Next.js (App Router) + React (TypeScript)**, **Tailwind CSS + shadcn/ui**, **BDD tests (Vitest/RTL + Playwright)**, **CI**, **ESLint/Prettier**.
 - **Optional:** OpenAI per-event summary behind a feature flag.
@@ -65,10 +65,7 @@ A lightweight, anonymous web app to **submit** and **browse** event feedback in 
 
 ### 5.2 Feedback Stream
 
-- **Realtime transport:** WebSockets via Socket.IO.
-  - Global room: `feedbacks`.
-  - Per-event room: `event:<event_id>`.
-- **Broadcast on create:** payload schema in §10.
+- **Updates:** client polls API periodically for new items.
 - **Filters:** `event_id` (single), `rating` (single).
 - **Sorting:**
   - `newest` (default): `created_at desc, id desc`.
@@ -237,40 +234,11 @@ Payload identical to global list; implicitly scoped by `:event_id`.
 
 ---
 
-## 10) Realtime (WebSockets via Socket.IO)
+## 10) Live Updates (Polling)
 
-**Namespaces/rooms**
-
-- Global room: `feedbacks`.
-- Per-event room: `event:<event_id>`.
-
-**Broadcast on create**
-
-```json
-{
-  "type": "feedback.created",
-  "payload": {
-    "id": "…",
-    "event_id": "…",
-    "event_name": "Workshop A",
-    "rating": 5,
-    "text": "Loved it!",
-    "created_at": "2025-08-18T15:34:12Z"
-  }
-}
-```
-
-**(Optional) Summary update**
-
-```json
-{ "type": "summary.updated", "payload": { "event_id": "…", "summary": "…" } }
-```
-
-**Client behavior**
-
-- `sort=newest`: **prepend** on arrival.
-- `sort=highest`: insert by `(rating desc, created_at desc, id desc)`.
-- Ignore items that don’t match current filters.
+- Client polls `GET /api/v1/feedbacks` (or per-event route) on an interval.
+- `sort=newest`: prepend new items; `sort=highest`: insert by `(rating desc, created_at desc, id desc)`.
+- When scrolled away from top, queue new items and surface a banner to apply.
 
 ---
 
@@ -300,7 +268,7 @@ Payload identical to global list; implicitly scoped by `:event_id`.
 - **Next.js 14 (App Router)** with **React** and **TypeScript**.
 - **Tailwind CSS + shadcn/ui**.
 - **Postgres** with **Prisma ORM**.
-- **WebSockets (Socket.IO)** for realtime.
+ 
 - **Background jobs (optional summaries):** **BullMQ** (Redis) or in-process debounce for take-home.
 - **Docker + docker-compose** for Next.js, Postgres, Redis.
 
@@ -312,7 +280,7 @@ app/
   api/v1/feedbacks/route.ts            # GET (list), POST (create)
   api/v1/events/[event_id]/feedbacks/route.ts
   api/v1/events/[event_id]/summary/route.ts
-  api/socket/route.ts                  # optional Socket.IO server endpoint
+  
 components/
   ui/                                   # shadcn/ui components
   FeedbackCard.tsx, SubmitForm.tsx, ...
@@ -329,7 +297,7 @@ prisma/
 /api/v1/feedbacks                      → GET, POST
 /api/v1/events/:event_id/feedbacks     → GET
 /api/v1/events/:event_id/summary       → GET (optional)
-/api/socket                            → Socket.IO server (if exposed)
+ 
 ```
 
 ---
@@ -383,7 +351,7 @@ prisma/
 - **Input validation** with Zod at API boundary; early coercion.
 - **DB constraints** (CHECKs) enforce rating/text bounds.
 - **Output escaping** everywhere; no Markdown/HTML rendering of user input.
-- **WebSockets:** validate/whitelist room params; only server emits on create.
+ 
 
 ---
 
@@ -446,5 +414,5 @@ FEATURE_SUMMARIES=true
 OPENAI_API_KEY=…
 DATABASE_URL=…
 REDIS_URL=redis://redis:6379/0
-NEXT_PUBLIC_SOCKET_URL=ws://localhost:3000
+NEXT_PUBLIC_POLL_INTERVAL_MS=5000
 ```

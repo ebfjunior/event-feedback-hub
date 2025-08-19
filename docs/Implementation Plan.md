@@ -6,8 +6,8 @@ Sources: [`docs/PRD.md`](./PRD.md), [`docs/Shape-Up Pitch.md`](./Shape-Up%20Pitc
 
 ## Objectives
 
-- Deliver a small, production-quality Next.js 14 + TypeScript app to submit and browse anonymous event feedback with realtime updates and infinite scroll.
-- Server-first architecture with clean REST API (`/api/v1`), Postgres via Prisma, WebSockets (Socket.IO), Tailwind + shadcn/ui, and comprehensive automated tests.
+- Deliver a small, production-quality Next.js 14 + TypeScript app to submit and browse anonymous event feedback with near–real-time updates (polling) and infinite scroll.
+- Server-first architecture with clean REST API (`/api/v1`), Postgres via Prisma, Tailwind + shadcn/ui, and comprehensive automated tests.
 - Optional AI per-event summaries behind a feature flag.
 
 ---
@@ -18,7 +18,7 @@ Sources: [`docs/PRD.md`](./PRD.md), [`docs/Shape-Up Pitch.md`](./Shape-Up%20Pitc
 - TypeScript (strict), Zod for runtime validation
 - Tailwind CSS + shadcn/ui
 - Postgres + Prisma ORM
-- Socket.IO for realtime
+- Polling for near-real-time updates
 - Redis + BullMQ (optional summaries worker) or in-process debounce for take-home
 - Testing: Vitest + RTL, Playwright for E2E
 - Tooling: ESLint, Prettier (+ tailwind plugin), GitHub Actions CI
@@ -40,7 +40,7 @@ app/
   api/v1/feedbacks/route.ts
   api/v1/events/[event_id]/feedbacks/route.ts
   api/v1/events/[event_id]/summary/route.ts
-  api/socket/route.ts
+  
 application/
   ports/
     EventRepository.ts
@@ -122,15 +122,15 @@ Definition of done: Schema constraints enforced; seeds generated without errors.
 - [x] `lib/queries/feedbacks.ts`: composable Prisma queries for list endpoints using keyset tuples
 - [x] `lib/validation.ts`: Zod schemas for request params and bodies
 - [x] `lib/responses.ts`: typed success and error envelopes (400/404/422)
-- [x] `lib/realtime.ts`: Socket.IO server helpers (rooms, emit helpers, CORS guard)
+ 
 
 Lightweight Clean Architecture layers (80/20):
 
 - [x] Domain (`domain/`): define `Event` and `Feedback` entities and core invariants.
-- [x] Application Ports (`application/ports/`): `EventRepository`, `FeedbackRepository`, `RealtimePublisher`, `SummaryService`.
+- [x] Application Ports (`application/ports/`): `EventRepository`, `FeedbackRepository`, `SummaryService`.
 - [x] Application Use Cases (`application/usecases/`): `listFeedbacks` (filters/sort/cursor), `createFeedback` (validation, persist, emit realtime).
 - [x] Infrastructure Repositories (`infrastructure/repositories/prisma/`): Prisma-backed implementations of ports; support transactions.
-- [x] Infrastructure Realtime (`infrastructure/realtime/`): Socket.IO publisher implementing `RealtimePublisher`.
+ 
 - [x] Optional Infrastructure AI (`infrastructure/ai/`): summary service implementing `SummaryService`.
 
 ### 3. API Endpoints (`/api/v1`)
@@ -152,18 +152,12 @@ Key points:
 - Newest keyset: `WHERE (created_at,id) < (?,?) ORDER BY created_at DESC, id DESC LIMIT ?`
 - Highest keyset: `WHERE (rating,created_at,id) < (?,?,?) ORDER BY rating DESC, created_at DESC, id DESC LIMIT ?`
 
-### 4. Realtime (Socket.IO)
+### 4. Live updates (Polling)
 
-- [x] `app/api/socket/route.ts` with Node runtime and CORS origins restricted to app
-- [x] Rooms: `feedbacks` (global), `event:<event_id>` (scoped)
-- [x] On create → server emits `feedback.created` with payload (PRD §10)
-- [x] Client util to subscribe/unsubscribe based on filters
-- [x] Validate room params server-side
-- [x] Socket tests: room validation, emission shape
-
-Architecture note:
-
-- Implement `RealtimePublisher` in `infrastructure/realtime/socketPublisher.ts` and inject into `createFeedback` use case.
+- [x] Drop WebSockets entirely.
+- [x] Stream polls `/api/v1/feedbacks` every X seconds (`NEXT_PUBLIC_POLL_INTERVAL_MS`, default 5000).
+- [x] New items queue when scrolled away from top; banner to apply.
+- [x] No server-side realtime components remain.
 
 ### 5. Frontend UI/UX (per mocks)
 
@@ -180,14 +174,14 @@ Components (see `UX Pilot Context.md` and mocks):
 - [x] `SubmitForm`: textarea (1–1000), star control, submit; optimistic insert hook in place
 - [x] `FeedbackCard`: stars, escaped text, event name, relative timestamp
 - [x] `InfiniteList`: IntersectionObserver sentinel, loading row, end-of-list state
-- [x] `ReconnectBanner`: shows on websocket drop (polling fallback not yet added)
+-- [x] Remove `ReconnectBanner` as sockets are removed
 - [x] `EmptyState` and `ErrorState`
 
 Behaviors:
 
 - [x] Server-first data fetching where possible; minimal client state
 - [x] Infinite scroll calls list endpoints with cursor; appends results; `next_cursor=null` ends (de-duped)
-- [x] Realtime:
+- [x] Live updates via polling:
   - [x] If sort=newest: prepend new matching item (de-duped)
   - [x] If sort=highest: ordered insert by `(rating desc, created_at desc, id desc)`
 - [x] Output escaping on render (React text render)
@@ -218,7 +212,7 @@ Tests:
 - [ ] Manual QA checklist (from PRD §19) executed
 
 Notes (Step 7):
-- Introduced `ALLOWED_ORIGINS` (comma-separated) for Socket.IO CORS. In production, explicit origins are required; dev defaults to `*` for convenience.
+ 
 - Documented security posture and manual QA checklist in `README.md`.
 - Fixed Next.js 15 dynamic route warnings by awaiting `params` in event page and summary API.
 
@@ -252,7 +246,7 @@ Unit/Component (Vitest + RTL):
 Request/Integration:
 
 - Route handlers: 200/400/404/422; pagination envelopes; index-backed ordering
-- Socket emission: `feedback.created` on POST; room scoping
+ 
 
 Domain/Application:
 
@@ -272,14 +266,14 @@ Coverage target: high on core logic; do not chase 100% where brittle.
 - Align composite indexes with ORDER BY + tuple WHERE (include `id` for tie-break)
 - Include `event_name` in API payloads to avoid N+1
 - Cache and revalidation: use server-side fetch with explicit `{ next: { revalidate } }` or `no-store` intentionally
-- WebSocket origins restricted to app origin(s)
+ 
 
 ---
 
 ## Risks & Mitigations
 
 - Keyset pagination bugs → property-style tests; careful tuple comparisons
-- Realtime flakiness → reconnect banner + polling fallback of first page every 5s
+- Realtime flakiness → handled purely via polling cadence
 - XSS via user text → store raw; escape on render; explicit test with `<script>` and `<img onerror>`
 - Highest-sort insertion complexity → acceptable cutline to append + refresh hint; document
 - OpenAI instability → feature flag; fail silent; retries/backoff; UI hides panel
@@ -288,18 +282,16 @@ Coverage target: high on core logic; do not chase 100% where brittle.
 
 ## Environment & Configuration
 
-Env vars (see PRD §22):
+Env vars:
 
 ```
 FEATURE_SUMMARIES=true
 OPENAI_API_KEY=...
 DATABASE_URL=...
 REDIS_URL=redis://redis:6379/0
-NEXT_PUBLIC_SOCKET_URL=ws://localhost:3000
+NEXT_PUBLIC_POLL_INTERVAL_MS=5000
 # App base URL (used for links)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-# Socket.IO allowed origins (protocol + host, comma-separated for multiple). Required in prod.
-ALLOWED_ORIGINS=http://localhost:3000
 ```
 
 ---

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { EventListItem, FeedbackItem, SortOption } from '@/types/api';
 import { fetchFeedbacks } from '@/lib/api';
 import { EventSelect } from '@/components/controls/EventSelect';
@@ -10,12 +10,10 @@ import { SortToggle } from '@/components/controls/SortToggle';
 import { FeedbackCard } from '@/components/FeedbackCard';
 import { FeedbackCardSkeleton } from '@/components/FeedbackCard.Skeleton';
 import { InfiniteList } from '@/components/InfiniteList';
-import { ReconnectBanner } from '@/components/ReconnectBanner';
 import { NewItemsBanner } from '@/components/NewItemsBanner';
 import { EmptyState } from '@/components/EmptyState';
 import { ErrorState } from '@/components/ErrorState';
-import { getClientSocket } from '@/lib/realtime-client';
-import { roomForAllFeedbacks, roomForEvent } from '@/lib/realtime';
+ 
 
 export type StreamProps = {
   events: EventListItem[];
@@ -35,7 +33,7 @@ export function Stream({ events, fixedEventId }: StreamProps) {
   const [queued, setQueued] = useState<FeedbackItem[]>([]);
   const [isAtTop, setIsAtTop] = useState(true);
 
-  const room = useMemo(() => (eventId ? roomForEvent(eventId) : roomForAllFeedbacks()), [eventId]);
+  const POLL_INTERVAL_MS = Number(process.env.NEXT_PUBLIC_POLL_INTERVAL_MS || 5000);
 
   const load = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -100,46 +98,56 @@ export function Stream({ events, fixedEventId }: StreamProps) {
   }, [eventId, rating, sort]);
 
   useEffect(() => {
-    const socket = getClientSocket();
-    function onCreated(payload: FeedbackItem) {
-      // if user scrolled up, queue until they click banner
-      if (!isAtTop) {
-        setQueued((q) => (q.some((x) => x.id === payload.id) ? q : [payload, ...q]));
-        return;
-      }
-      // filter match
-      if (eventId && payload.event_id !== eventId) return;
-      if (typeof rating === 'number' && payload.rating !== rating) return;
-      if (sort === 'newest') {
+    let cancelled = false;
+    async function pollOnce() {
+      try {
+        const res = await fetchFeedbacks({ event_id: eventId, rating, sort, limit: 20 });
+        if (cancelled) return;
         setItems((previousItems) => {
-          if (previousItems.some((item) => item.id === payload.id)) return previousItems;
-          return [payload, ...previousItems];
-        });
-      } else {
-        // insert keeping ordering by rating desc then created_at desc then id desc
-        setItems((previousItems) => {
-          if (previousItems.some((item) => item.id === payload.id)) return previousItems;
+          const existingIds = new Set(previousItems.map((i) => i.id));
+          const newItems = res.data.filter((i) => !existingIds.has(i.id));
+          if (newItems.length === 0) return previousItems;
+
+          if (!isAtTop) {
+            setQueued((q) => {
+              const seen = new Set(q.map((i) => i.id));
+              const toQueue = newItems.filter((i) => !seen.has(i.id));
+              return [...toQueue, ...q];
+            });
+            return previousItems;
+          }
+
+          if (sort === 'newest') {
+            return [...newItems, ...previousItems];
+          }
+
+          // highest: insert by (rating desc, created_at desc, id desc)
           const next = [...previousItems];
-          const idx = next.findIndex(
-            (x) =>
-              x.rating < payload.rating ||
-              (x.rating === payload.rating && x.created_at < payload.created_at) ||
-              (x.rating === payload.rating && x.created_at === payload.created_at && x.id < payload.id),
-          );
-          if (idx === -1) next.push(payload);
-          else next.splice(idx, 0, payload);
+          for (const payload of newItems) {
+            const idx = next.findIndex(
+              (x) =>
+                x.rating < payload.rating ||
+                (x.rating === payload.rating && x.created_at < payload.created_at) ||
+                (x.rating === payload.rating && x.created_at === payload.created_at && x.id < payload.id),
+            );
+            if (idx === -1) next.push(payload);
+            else next.splice(idx, 0, payload);
+          }
           return next;
         });
+      } catch {
+        // ignore polling errors; visible errors come from explicit loads
       }
     }
 
-    socket.on('feedback.created', onCreated);
-    socket.emit('join', room as any);
+    // immediate poll once, then interval
+    void pollOnce();
+    const id = window.setInterval(pollOnce, POLL_INTERVAL_MS);
     return () => {
-      socket.emit('leave', room as any);
-      socket.off('feedback.created', onCreated);
+      cancelled = true;
+      window.clearInterval(id);
     };
-  }, [room, eventId, rating, sort, isAtTop]);
+  }, [eventId, rating, sort, isAtTop, POLL_INTERVAL_MS]);
 
   const applyQueued = useCallback(() => {
     if (queued.length === 0) return;
@@ -150,7 +158,6 @@ export function Stream({ events, fixedEventId }: StreamProps) {
 
   return (
     <div className="space-y-4">
-      <ReconnectBanner />
       <div className="flex flex-wrap items-center gap-2">
         {!fixedEventId && <EventSelect events={events} value={eventId} onChange={setEventId} />}
         <RatingSelect value={rating} onChange={setRating} />

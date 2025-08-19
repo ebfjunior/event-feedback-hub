@@ -26,14 +26,4 @@ export type ListFeedbacksRequest = {
   limit?: number;
   cursor?: string | null;
 };
-
-// Next API route Socket.IO augmentation
-import type { NextApiResponse } from 'next';
-
-export type NextApiResponseServerIO = NextApiResponse & {
-  socket: {
-    server: {
-      io?: unknown;
-    };
-  };
-};
+ 

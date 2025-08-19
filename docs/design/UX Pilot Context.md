@@ -51,7 +51,7 @@ You are designing UI/UX mocks for "Event Feedback HUB" — a small, anonymous Ra
   - If filters match: insert new item
   - Sort=Newest: prepend at top
   - Sort=Highest: ideally insert by (rating desc, created_at desc, id desc); acceptable cutline: append + subtle "Order refreshed" hint
-- Reconnect banner if websocket drops; degrade to polling first page every 5s (show subtle "Reconnecting…")
+- Polling cadence every 5s; when scrolled away from top, show subtle "New items" banner
 
 ### 2) Optional Event View (if time permits)
 
@@ -64,7 +64,7 @@ You are designing UI/UX mocks for "Event Feedback HUB" — a small, anonymous Ra
 - SubmitForm (textarea + star radio group + submit)
 - FeedbackCard (stars, text, event name, relative time, subtle dividers)
 - InfiniteList (container + loading row + sentinel)
-- ReconnectBanner (non-blocking, dismissible)
+ 
 - EmptyState, ErrorState components
 
 ## States & Specs to Show

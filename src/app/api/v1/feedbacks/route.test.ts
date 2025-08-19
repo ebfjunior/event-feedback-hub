@@ -10,12 +10,7 @@ vi.mock('@/application/usecases/createFeedback', () => ({
   createFeedback: vi.fn(),
 }));
 
-vi.mock('@/infrastructure/realtime/server', () => {
-  return {
-    ensureSocketIOServerStarted: vi.fn(),
-    getServerIO: vi.fn(() => undefined),
-  };
-});
+// realtime server removed; no-op mocks
 
 function jsonResponseBody(res: NextResponse) {
   // NextResponse extends Response

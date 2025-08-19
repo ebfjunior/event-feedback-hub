@@ -6,8 +6,6 @@ import { ListFeedbacksQuerySchema, CreateFeedbackBodySchema } from '@/lib/valida
 import { badRequest, notFound, ok, serverError, unprocessable } from '@/lib/responses';
 import { listFeedbacks } from '@/application/usecases/listFeedbacks';
 import { createFeedback } from '@/application/usecases/createFeedback';
-import { SocketRealtimePublisher } from '@/infrastructure/realtime/socketPublisher';
-import { ensureSocketIOServerStarted, getServerIO } from '@/infrastructure/realtime/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,9 +69,7 @@ export async function POST(request: Request) {
     }
 
     const feedbackRepo = new FeedbackRepositoryPrisma(prisma);
-    ensureSocketIOServerStarted();
-    const publisher = new SocketRealtimePublisher(getServerIO());
-    const created = await createFeedback(feedbackRepo, publisher, {
+    const created = await createFeedback(feedbackRepo, {
       eventId: event_id,
       eventName,
       rating,

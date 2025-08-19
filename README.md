@@ -43,9 +43,8 @@ Copy `.env.local.example` to `.env.local` and set the following variables:
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Realtime (Socket.IO)
-# Comma-separated list of allowed origins for Socket.IO CORS (protocol+host only)
-ALLOWED_ORIGINS=http://localhost:3000
+ 
+NEXT_PUBLIC_POLL_INTERVAL_MS=5000
 
 # Feature flags
 FEATURE_SUMMARIES=false
@@ -60,7 +59,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 ## Security Posture
 
 - Same-origin app: no auth/cookies. All endpoints are public read; writes validate input.
-- Socket.IO CORS: in production you must set `ALLOWED_ORIGINS` (or `NEXT_PUBLIC_APP_URL`). Dev defaults to permissive `*` for convenience.
+ 
 - Output escaping: user-generated feedback text is rendered as plain text by React; no `dangerouslySetInnerHTML`.
 - DB constraints: rating range and text length enforced by Prisma/DB.
 - Error envelopes: consistent JSON shapes for clients (`lib/responses.ts`).
@@ -72,4 +71,4 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 - Submit feedback: client validates; POST succeeds; item appears and streams across tabs.
 - Realtime: open a second tab; new feedback appears within ~1–2s.
 - Event page: clicking event name navigates and stream is scoped; if enabled, AI summary panel renders or shows fallback text on errors.
-- Env hardening: in prod, requests from disallowed origins cannot connect to Socket.IO.
+ 

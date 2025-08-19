@@ -6,7 +6,7 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 
 (a) solid product instincts
 (b) correct REST API design with Next.js route handlers
-(c) realtime via WebSockets (Socket.IO)
+(c) near–realtime via polling
 (d) infinite scroll with keyset pagination
 (e) code quality (BDD, CI, lint)
 
@@ -67,9 +67,9 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 
 ## 5) Key Decisions (locked for build)
 
-- **Security mode:** Same-origin app (Next.js serves UI + API). Avoid cookies for anonymous flows; if cookies added, use SameSite=Lax. Socket.IO origins limited to the app origin.
+- **Security mode:** Same-origin app (Next.js serves UI + API). Avoid cookies for anonymous flows; if cookies added, use SameSite=Lax.
 - **Pagination:** Keyset cursors, opaque `base64url(JSON)` with `{v:1, sort:"newest"|"highest", k:[…]}`.
-- **Realtime:** Socket.IO. Broadcast to `"feedbacks"` (global) and `"event:<id>"` (scoped).
+- **Live updates:** Polling the latest page and merging into the stream.
 - **(Optional) OpenAI summaries:** Recompute **whichever comes first**: debounce **5 minutes** since last change, or every **10 new feedbacks** per event. Store in `event_summaries` and broadcast `summary.updated`.
 - **Timestamps:** `created_at` RFC3339 in API. All ordering uses `(… DESC, id DESC)` tie-break.
 - **API shape & routes:** Exactly as PRD §9 (plural, `/api/v1`).
@@ -80,7 +80,7 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 
 ### Scope A — Project Skeleton & CI (Downhill)
 
-- Next.js app (App Router), Postgres, Redis, Socket.IO server endpoint.
+- Next.js app (App Router), Postgres.
 - Tailwind + shadcn/ui.
 - Docker compose: `web` (Next.js), `db` (Postgres), `redis`.
 - CI (GitHub Actions): Node setup, DB/Redis services, ESLint/Prettier, Vitest.
@@ -117,7 +117,7 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 ### Scope D — Submission + Broadcast (Steep)
 
 - `POST /api/v1/feedbacks` validations (existence, bounds, trimming, escape on render).
-- Broadcast payload per PRD §10 to global and event rooms via Socket.IO.
+ 
 - Room param whitelist/validation.
 
 **Demo:** Two browser tabs; submitting shows ~1–2s live update in both.
@@ -177,7 +177,7 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 
 - **Next.js skeleton**
   - Route handlers under `app/api/v1/.../route.ts`.
-  - Socket.IO server endpoint under `app/api/socket/route.ts` (Node runtime) or a custom server.
+  
   - Zod schemas for input validation; return RFC3339 `created_at`.
 - **Keyset**
   - Newest: `WHERE (created_at,id) < (?,?) ORDER BY created_at DESC, id DESC LIMIT ?`
@@ -220,7 +220,7 @@ TrustLayer hiring team wants a small but real Next.js + React (TypeScript) app t
 ## 12) README Outline (to include in repo)
 
 - **Overview** & PRD link/summary
-- **Stack**: Next.js 14 (App Router), React, TypeScript, Tailwind, Postgres, Prisma, Redis, Socket.IO
+- **Stack**: Next.js 14 (App Router), React, TypeScript, Tailwind, Postgres, Prisma
 - **Run locally**: `docker compose up` or `pnpm install && pnpm dev`
 - **Env vars**: (from PRD §22)
 - **Seeding**: `prisma db push && prisma db seed`
