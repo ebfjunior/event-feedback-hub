@@ -9,6 +9,7 @@ export interface ChatClient {
     messages: ChatMessage[];
     temperature?: number;
     timeoutMs?: number;
+    responseFormat?: 'json_object' | null;
   }): Promise<string>;
 }
 
@@ -24,18 +25,23 @@ export class OpenAIChatClient implements ChatClient {
     messages: ChatMessage[];
     temperature?: number;
     timeoutMs?: number;
+    responseFormat?: 'json_object' | null;
   }): Promise<string> {
-    const { model, messages, temperature = 0.2, timeoutMs = 15000 } = params;
+    const { model, messages, temperature = 0.2, timeoutMs = 15000, responseFormat } = params;
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
     try {
+      const body: Record<string, unknown> = { model, messages, temperature };
+      if (responseFormat) {
+        body.response_format = { type: responseFormat };
+      }
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.apiKey}`,
         },
-        body: JSON.stringify({ model, messages, temperature }),
+        body: JSON.stringify(body),
         signal: controller.signal,
       });
       if (!res.ok) {

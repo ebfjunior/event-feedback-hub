@@ -1,13 +1,16 @@
 import { fetchEvents, fetchEventSummary } from '@/lib/api';
 import { SubmitForm } from '@/components/SubmitForm';
 import { Stream } from '@/components/Stream';
+import { AISummaryCard } from '@/components/AISummaryCard';
 
 export default async function EventPage({ params }: { params: Promise<{ event_id: string }> }) {
   const events = await fetchEvents();
   const { event_id } = await params;
   const selected = events.find((e) => e.id === event_id);
   const summariesEnabled = process.env.FEATURE_SUMMARIES === 'true';
-  let summary: string | null = null;
+  let summary:
+    | { positive_percentage: number; top_highlights: string[]; areas_for_improvement: string[] }
+    | null = null;
   if (summariesEnabled && selected) {
     try {
       const data = await fetchEventSummary(selected.id);
@@ -25,14 +28,7 @@ export default async function EventPage({ params }: { params: Promise<{ event_id
 
       <div className="grid gap-6 md:grid-cols-[320px_1fr]">
         <aside className="space-y-6">
-          {summariesEnabled && selected ? (
-            <div className="rounded-lg border bg-card p-4 text-card-foreground">
-              <div className="mb-2 text-sm font-medium">AI Summary</div>
-              <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {summary ?? 'Summary unavailable.'}
-              </div>
-            </div>
-          ) : null}
+          {summariesEnabled && selected && <AISummaryCard summary={summary} />}
           <SubmitForm events={events} />
         </aside>
         <main>

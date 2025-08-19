@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { createFeedback } from '@/lib/api';
 import type { EventListItem } from '@/types/api';
+import { Star } from 'lucide-react';
 
 const FormSchema = z.object({
   event_id: z.string().uuid({ message: 'Choose an event' }),
@@ -29,7 +30,7 @@ export function SubmitForm({ events, onCreated, className }: SubmitFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const { register, handleSubmit, setValue, watch, formState, reset } = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema) as any,
+    resolver: zodResolver(FormSchema),
     defaultValues: { rating: 5, text: '', anonymous: true },
   });
   const rating = watch('rating');
@@ -76,16 +77,15 @@ export function SubmitForm({ events, onCreated, className }: SubmitFormProps) {
             return (
               <button
                 type="button"
-                key={value}
+                key={`icon-${value}`}
                 aria-label={`${value} star`}
                 onMouseEnter={() => setHoverRating(value)}
                 onMouseLeave={() => setHoverRating(null)}
                 onClick={() => setValue('rating', value)}
-                className={cn(
-                  'h-6 w-6 rounded-full border',
-                  active ? 'bg-yellow-400 border-yellow-400' : 'border-muted-foreground/30',
-                )}
-              />
+                className="transition-colors"
+              >
+                <Star className={cn('h-6 w-6', active ? 'fill-yellow-400 stroke-yellow-400' : 'stroke-muted-foreground')} />
+              </button>
             );
           })}
         </div>

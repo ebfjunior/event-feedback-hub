@@ -1,4 +1,4 @@
-import type { SummaryService } from '@/application/ports/SummaryService';
+import type { SummaryService, EventSummary } from '@/application/ports/SummaryService';
 import type { PrismaClient } from '@prisma/client';
 import type { ChatClient } from '@/infrastructure/ai/openaiClient';
 import { OpenAIChatClient } from '@/infrastructure/ai/openaiClient';
@@ -27,48 +27,92 @@ export class OpenAISummaryService implements SummaryService {
     this.chatClient = this.apiKey ? new OpenAIChatClient(this.apiKey) : null;
   }
 
-  async computeSummaryForEvent(eventId: string): Promise<string> {
-    // Fetch the most recent feedback texts for the event
+  async computeSummaryForEvent(eventId: string): Promise<EventSummary> {
+    // Fetch the most recent feedback for the event
     const feedbacks = await this.prisma.feedback.findMany({
       where: { eventId },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-      select: { text: true },
+      select: { text: true, rating: true },
       take: this.maxItems,
     });
 
     if (feedbacks.length === 0) {
-      return 'No feedback available yet.';
+      return { positive_percentage: 0, top_highlights: [], areas_for_improvement: [] };
+    }
+
+    // Fallback path when no API key
+    if (!this.chatClient) {
+      const positive = feedbacks.filter((f: { rating: number | null }) => (f.rating ?? 0) >= 4).length;
+      const negative = feedbacks.filter((f: { rating: number | null }) => (f.rating ?? 0) <= 2).length;
+      const denom = positive + negative || feedbacks.length;
+      const positive_percentage = Math.round((positive / Math.max(denom, 1)) * 100);
+      return {
+        positive_percentage,
+        top_highlights: ['Summaries are unavailable without AI. Showing heuristic positivity only.'],
+        areas_for_improvement: [],
+      };
     }
 
     const concatenated = feedbacks
-      .map((f: { text: string }, i: number) => `${i + 1}. ${f.text}`)
+      .map((f: { text: string; rating: number | null }, i: number) => `${i + 1}. [rating:${f.rating ?? 'n/a'}] ${f.text}`)
       .join('\n');
 
-    // If no API key is configured, return a simple heuristic summary as a safe fallback
-    if (!this.chatClient) {
-      // Very naive fallback: length and sentiment hints are omitted to avoid flaky behavior
-      const approxCount = feedbacks.length;
-      return `Summary (fallback): ${approxCount} recent feedback entries captured. Themes will appear here when the summaries feature is fully configured.`;
-    }
+    const schemaHint = `You must return ONLY a compact JSON object with keys: 
+{"positive_percentage": number (0-100), "top_highlights": string[], "areas_for_improvement": string[]}`;
 
-    // Use the chat client abstraction for testability
-    const content = await this.chatClient.complete({
+    const raw = await this.chatClient.complete({
       model: this.model,
       messages: [
         {
           role: 'system',
-          content:
-            'You are an assistant that produces a concise, neutral summary of event feedback. Capture key themes, sentiment, and actionable insights in 3-6 bullet points. Keep it under 120 words. Do not include personal data or quotes.',
+          content: 'You analyze event feedback and produce structured summaries. Return strict JSON only, no markdown.',
         },
         {
           role: 'user',
-          content: `Summarize the following feedback entries for the event.\n\n${concatenated}`,
+          content: `${schemaHint}\n\nHere are recent feedback entries (most recent first). Identify what went well and what to improve.\n\n${concatenated}`,
         },
       ],
       temperature: 0.2,
       timeoutMs: this.timeoutMs,
+      responseFormat: 'json_object',
     });
-    return content;
+
+    // Parse model output safely
+    let parsed: EventSummary | null = null;
+    try {
+      parsed = JSON.parse(raw) as EventSummary;
+      // Basic shape validation
+      if (
+        parsed === null ||
+        typeof parsed.positive_percentage !== 'number' ||
+        !Array.isArray(parsed.top_highlights) ||
+        !Array.isArray(parsed.areas_for_improvement)
+      ) {
+        parsed = null;
+      }
+    } catch {
+      parsed = null;
+    }
+
+    if (!parsed) {
+      // Graceful fallback using heuristic
+      const positive = feedbacks.filter((f: { rating: number | null }) => (f.rating ?? 0) >= 4).length;
+      const negative = feedbacks.filter((f: { rating: number | null }) => (f.rating ?? 0) <= 2).length;
+      const denom = positive + negative || feedbacks.length;
+      const positive_percentage = Math.round((positive / Math.max(denom, 1)) * 100);
+      return {
+        positive_percentage,
+        top_highlights: ['AI response could not be parsed. Showing heuristic positivity only.'],
+        areas_for_improvement: [],
+      };
+    }
+
+    // Clamp percentage to 0..100 just in case
+    parsed.positive_percentage = Math.max(0, Math.min(100, Math.round(parsed.positive_percentage)));
+    // Trim arrays and cap lengths
+    parsed.top_highlights = parsed.top_highlights.map((s) => s.trim()).filter(Boolean).slice(0, 5);
+    parsed.areas_for_improvement = parsed.areas_for_improvement.map((s) => s.trim()).filter(Boolean).slice(0, 5);
+    return parsed;
   }
 }
 
