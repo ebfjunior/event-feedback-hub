@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EmptyState (snapshot) > renders with custom message 1`] = `
+<div
+  class="rounded-md border bg-card p-6 text-center text-sm text-muted-foreground"
+>
+  Nothing here
+</div>
+`;
+
+exports[`EmptyState (snapshot) > renders with default message 1`] = `
+<div
+  class="rounded-md border bg-card p-6 text-center text-sm text-muted-foreground"
+>
+  No feedback yet.
+</div>
+`;

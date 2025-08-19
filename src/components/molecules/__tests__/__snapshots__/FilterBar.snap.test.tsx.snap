@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FilterBar (snapshot) > hides EventSelect when fixedEventId present 1`] = `
+<div
+  class="flex flex-wrap items-center gap-2"
+>
+  <div
+    data-mock="RatingSelect"
+  />
+  <div
+    data-mock="SortToggle"
+    value="newest"
+  />
+</div>
+`;
+
+exports[`FilterBar (snapshot) > renders with all controls 1`] = `
+<div
+  class="flex flex-wrap items-center gap-2"
+>
+  <div
+    data-mock="EventSelect"
+    events="[object Object]"
+  />
+  <div
+    data-mock="RatingSelect"
+  />
+  <div
+    data-mock="SortToggle"
+    value="newest"
+  />
+</div>
+`;

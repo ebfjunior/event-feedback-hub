@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`InfiniteList (snapshot) > renders loading and sentinel states 1`] = `
+<div
+  class="space-y-3"
+>
+  <div>
+    A
+  </div>
+  <div>
+    B
+  </div>
+  <div
+    class="text-center text-sm text-muted-foreground"
+  >
+    Loading…
+  </div>
+  <div />
+</div>
+`;
+
+exports[`InfiniteList (snapshot) > renders loading and sentinel states 2`] = `
+<div
+  class="space-y-3"
+>
+  <div
+    class="text-center text-sm text-muted-foreground"
+  >
+    End of the list
+  </div>
+  <div />
+</div>
+`;

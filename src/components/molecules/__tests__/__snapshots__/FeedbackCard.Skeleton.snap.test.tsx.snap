@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FeedbackCardSkeleton (snapshot) > renders 1`] = `
+<div
+  class="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm animate-pulse bg-card/60"
+  data-slot="card"
+>
+  <div
+    class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 gap-1.5"
+    data-slot="card-header"
+  >
+    <div
+      class="h-5 w-40 rounded bg-muted"
+    />
+    <div
+      class="h-3 w-16 rounded bg-muted"
+    />
+    <div
+      class="col-start-2 row-span-2 row-start-1 self-start justify-self-end"
+      data-slot="card-action"
+    >
+      <div
+        class="h-4 w-24 rounded bg-muted"
+      />
+    </div>
+  </div>
+  <div
+    class="px-6 pt-0"
+    data-slot="card-content"
+  >
+    <div
+      class="space-y-2"
+    >
+      <div
+        class="h-3 w-full rounded bg-muted"
+      />
+      <div
+        class="h-3 w-5/6 rounded bg-muted"
+      />
+      <div
+        class="h-3 w-4/6 rounded bg-muted"
+      />
+    </div>
+    <div
+      class="mt-3 h-3 w-24 rounded bg-muted"
+    />
+  </div>
+</div>
+`;

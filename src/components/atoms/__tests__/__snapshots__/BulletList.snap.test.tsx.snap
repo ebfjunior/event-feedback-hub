@@ -1,0 +1,59 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BulletList (snapshot) > renders placeholder when empty 1`] = `
+<ul>
+  <li
+    class="flex gap-2"
+  >
+    <span
+      class="select-none"
+    >
+      •
+    </span>
+    <span>
+      —
+    </span>
+  </li>
+</ul>
+`;
+
+exports[`BulletList (snapshot) > renders with items 1`] = `
+<ul>
+  <li
+    class="flex gap-2"
+  >
+    <span
+      class="select-none"
+    >
+      •
+    </span>
+    <span>
+      a
+    </span>
+  </li>
+  <li
+    class="flex gap-2"
+  >
+    <span
+      class="select-none"
+    >
+      •
+    </span>
+    <span>
+      b
+    </span>
+  </li>
+  <li
+    class="flex gap-2"
+  >
+    <span
+      class="select-none"
+    >
+      •
+    </span>
+    <span>
+      c
+    </span>
+  </li>
+</ul>
+`;

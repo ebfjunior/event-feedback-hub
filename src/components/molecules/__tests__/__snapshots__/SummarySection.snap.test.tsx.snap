@@ -1,0 +1,79 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SummarySection (snapshot) > renders with empty items 1`] = `
+<section
+  class="rounded-md bg-muted/40 p-3"
+>
+  <div
+    class="mb-2 flex items-center gap-2 text-sm font-semibold"
+  >
+    <span>
+      i
+    </span>
+    <span>
+      Highlights
+    </span>
+  </div>
+  <ul
+    class="list-inside space-y-2 text-sm text-muted-foreground"
+  >
+    <li
+      class="flex gap-2"
+    >
+      <span
+        class="select-none"
+      >
+        •
+      </span>
+      <span>
+        —
+      </span>
+    </li>
+  </ul>
+</section>
+`;
+
+exports[`SummarySection (snapshot) > renders with items 1`] = `
+<section
+  class="rounded-md bg-muted/40 p-3"
+>
+  <div
+    class="mb-2 flex items-center gap-2 text-sm font-semibold"
+  >
+    <span>
+      i
+    </span>
+    <span>
+      Highlights
+    </span>
+  </div>
+  <ul
+    class="list-inside space-y-2 text-sm text-muted-foreground"
+  >
+    <li
+      class="flex gap-2"
+    >
+      <span
+        class="select-none"
+      >
+        •
+      </span>
+      <span>
+        Nice
+      </span>
+    </li>
+    <li
+      class="flex gap-2"
+    >
+      <span
+        class="select-none"
+      >
+        •
+      </span>
+      <span>
+        Great
+      </span>
+    </li>
+  </ul>
+</section>
+`;

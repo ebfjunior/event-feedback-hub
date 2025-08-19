@@ -1,0 +1,40 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PercentageBar (snapshot) > renders clamped values 1`] = `
+<div>
+  <div
+    class="h-2 w-full overflow-hidden rounded-full bg-muted"
+  >
+    <div
+      class="h-full rounded-full bg-emerald-500 transition-all"
+      style="width: 0%;"
+    />
+  </div>
+</div>
+`;
+
+exports[`PercentageBar (snapshot) > renders clamped values 2`] = `
+<div>
+  <div
+    class="h-2 w-full overflow-hidden rounded-full bg-muted"
+  >
+    <div
+      class="h-full rounded-full bg-emerald-500 transition-all"
+      style="width: 50%;"
+    />
+  </div>
+</div>
+`;
+
+exports[`PercentageBar (snapshot) > renders clamped values 3`] = `
+<div>
+  <div
+    class="h-2 w-full overflow-hidden rounded-full bg-muted"
+  >
+    <div
+      class="h-full rounded-full bg-emerald-500 transition-all"
+      style="width: 100%;"
+    />
+  </div>
+</div>
+`;

@@ -1,0 +1,105 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FeedbackCard (snapshot) > renders highlighted 1`] = `
+<div
+  class="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 bg-card/60 shadow-sm ring-1 ring-yellow-400"
+  data-slot="card"
+>
+  <div
+    class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 gap-1.5"
+    data-slot="card-header"
+  >
+    <a
+      aria-label="Open event Event 1"
+      class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90 truncate max-w-full"
+      data-slot="badge"
+      href="/events/e1"
+    >
+      Event 1
+    </a>
+    <div
+      class="text-muted-foreground text-xs"
+      data-slot="card-description"
+    >
+      in 10 minutes
+    </div>
+    <div
+      class="col-start-2 row-span-2 row-start-1 self-start justify-self-end"
+      data-slot="card-action"
+    >
+      <div
+        data-stars="true"
+      >
+        4
+      </div>
+    </div>
+  </div>
+  <div
+    class="px-6 pt-0"
+    data-slot="card-content"
+  >
+    <div
+      class="text-sm text-foreground/90"
+    >
+      Great event
+    </div>
+    <div
+      class="mt-3 text-xs text-muted-foreground"
+    >
+      Anonymous
+    </div>
+  </div>
+</div>
+`;
+
+exports[`FeedbackCard (snapshot) > renders non-highlighted 1`] = `
+<div
+  class="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 bg-card/60 shadow-sm"
+  data-slot="card"
+>
+  <div
+    class="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 gap-1.5"
+    data-slot="card-header"
+  >
+    <a
+      aria-label="Open event Event 1"
+      class="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90 truncate max-w-full"
+      data-slot="badge"
+      href="/events/e1"
+    >
+      Event 1
+    </a>
+    <div
+      class="text-muted-foreground text-xs"
+      data-slot="card-description"
+    >
+      in 10 minutes
+    </div>
+    <div
+      class="col-start-2 row-span-2 row-start-1 self-start justify-self-end"
+      data-slot="card-action"
+    >
+      <div
+        data-stars="true"
+      >
+        4
+      </div>
+    </div>
+  </div>
+  <div
+    class="px-6 pt-0"
+    data-slot="card-content"
+  >
+    <div
+      class="text-sm text-foreground/90"
+    >
+      Great event
+    </div>
+    <div
+      class="mt-3 text-xs text-muted-foreground"
+    >
+      Anonymous
+    </div>
+  </div>
+</div>
+`;

@@ -1,0 +1,63 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`RatingSelect (snapshot) > renders 1`] = `
+<div
+  data-mock="Select"
+  value="all"
+>
+  <div
+    class="w-36"
+    data-mock="SelectTrigger"
+  >
+    <div
+      data-mock="SelectValue"
+      placeholder="All Ratings"
+    />
+  </div>
+  <div
+    data-mock="SelectContent"
+  >
+    <div
+      data-mock="SelectItem"
+      value="all"
+    >
+      All Ratings
+    </div>
+    <div
+      data-mock="SelectItem"
+      value="5"
+    >
+      5
+       stars
+    </div>
+    <div
+      data-mock="SelectItem"
+      value="4"
+    >
+      4
+       stars
+    </div>
+    <div
+      data-mock="SelectItem"
+      value="3"
+    >
+      3
+       stars
+    </div>
+    <div
+      data-mock="SelectItem"
+      value="2"
+    >
+      2
+       stars
+    </div>
+    <div
+      data-mock="SelectItem"
+      value="1"
+    >
+      1
+       stars
+    </div>
+  </div>
+</div>
+`;

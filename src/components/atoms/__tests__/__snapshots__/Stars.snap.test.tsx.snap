@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Stars (snapshot) > renders with rating 1`] = `
+<div
+  aria-label="3 out of 5 stars"
+  class="flex items-center gap-1"
+>
+  <svg
+    class="h-4 w-4 fill-yellow-400 stroke-yellow-400"
+    data-icon="star"
+  />
+  <svg
+    class="h-4 w-4 fill-yellow-400 stroke-yellow-400"
+    data-icon="star"
+  />
+  <svg
+    class="h-4 w-4 fill-yellow-400 stroke-yellow-400"
+    data-icon="star"
+  />
+  <svg
+    class="h-4 w-4 stroke-muted-foreground"
+    data-icon="star"
+  />
+  <svg
+    class="h-4 w-4 stroke-muted-foreground"
+    data-icon="star"
+  />
+</div>
+`;

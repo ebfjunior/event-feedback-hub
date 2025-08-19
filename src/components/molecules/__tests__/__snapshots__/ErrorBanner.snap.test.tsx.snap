@@ -1,0 +1,18 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ErrorBanner (snapshot) > renders and triggers retry 1`] = `
+<div
+  class="flex items-center justify-between rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm"
+>
+  <div
+    class="text-destructive"
+  >
+    Failed
+  </div>
+  <button
+    class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 h-8 rounded-md px-3 text-xs"
+  >
+    Retry
+  </button>
+</div>
+`;

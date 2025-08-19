@@ -1,0 +1,18 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FeedbackStream (snapshot) > renders initial state 1`] = `
+<div
+  class="space-y-4"
+>
+  <div
+    data-mock="FilterBar"
+    events="[object Object]"
+    sort="newest"
+  />
+  <div
+    class="rounded-md border bg-card p-6 text-center text-sm text-muted-foreground"
+  >
+    No feedback yet.
+  </div>
+</div>
+`;

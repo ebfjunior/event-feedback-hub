@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`NewItemsBanner (snapshot) > renders when count > 0 and triggers onApply 1`] = `
+<div
+  class="flex items-center justify-between rounded-md border border-cyan-500/50 bg-cyan-50 p-2 text-sm text-cyan-800 dark:bg-cyan-950/40 dark:text-cyan-100"
+>
+  <div>
+    3
+     new feedback 
+    submissions
+     available
+  </div>
+  <button
+    class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 h-8 rounded-md px-3 text-xs"
+  >
+    Show
+  </button>
+</div>
+`;

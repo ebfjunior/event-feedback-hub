@@ -1,0 +1,40 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EventSelect (snapshot) > renders with events 1`] = `
+<div
+  data-mock="Select"
+  value="all"
+>
+  <div
+    class="w-48"
+    data-mock="SelectTrigger"
+  >
+    <div
+      data-mock="SelectValue"
+      placeholder="All Events"
+    />
+  </div>
+  <div
+    data-mock="SelectContent"
+  >
+    <div
+      data-mock="SelectItem"
+      value="all"
+    >
+      All Events
+    </div>
+    <div
+      data-mock="SelectItem"
+      value="e1"
+    >
+      Event 1
+    </div>
+    <div
+      data-mock="SelectItem"
+      value="e2"
+    >
+      Event 2
+    </div>
+  </div>
+</div>
+`;
