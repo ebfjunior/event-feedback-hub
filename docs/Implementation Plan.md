@@ -141,7 +141,7 @@ Lightweight Clean Architecture layers (80/20):
 - [x] `POST /api/v1/feedbacks` → validates and creates feedback; returns item with `event_name`
 - [x] Error envelopes per PRD with Zod-driven details
 - [x] Timestamps RFC3339
-- [ ] Unit/request tests: ordering correctness, cursor progression, bounds and 400/404/422
+- [~] Unit/request tests: 400/404/422 added; ordering correctness and cursor progression pending
 
 Route handler pattern:
 
@@ -181,7 +181,7 @@ Components (see `UX Pilot Context.md` and mocks):
 - [x] `FeedbackCard`: stars, escaped text, event name, relative timestamp
 - [x] `InfiniteList`: IntersectionObserver sentinel, loading row, end-of-list state
 - [x] `ReconnectBanner`: shows on websocket drop (polling fallback not yet added)
-- [ ] `EmptyState` and `ErrorState`
+- [x] `EmptyState` and `ErrorState`
 
 Behaviors:
 
