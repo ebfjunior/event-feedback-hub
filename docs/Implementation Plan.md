@@ -131,7 +131,7 @@ Lightweight Clean Architecture layers (80/20):
 - [x] Application Use Cases (`application/usecases/`): `listFeedbacks` (filters/sort/cursor), `createFeedback` (validation, persist, emit realtime).
 - [x] Infrastructure Repositories (`infrastructure/repositories/prisma/`): Prisma-backed implementations of ports; support transactions.
 - [x] Infrastructure Realtime (`infrastructure/realtime/`): Socket.IO publisher implementing `RealtimePublisher`.
-- [ ] Optional Infrastructure AI (`infrastructure/ai/`): summary service implementing `SummaryService`.
+- [x] Optional Infrastructure AI (`infrastructure/ai/`): summary service implementing `SummaryService`.
 
 ### 3. API Endpoints (`/api/v1`)
 
@@ -170,7 +170,7 @@ Architecture note:
 Pages:
 
 - [x] Home: filters (EventSelect, RatingSelect), SortToggle (Newest/Highest), SubmitForm, Live Stream (InfiniteList of FeedbackCard)
-- [~] Event view: scoped stream implemented; Summary panel pending (feature-flagged later)
+- [x] Event view: scoped stream implemented; Summary panel behind feature flag
 
 Components (see `UX Pilot Context.md` and mocks):
 
@@ -200,14 +200,14 @@ Tests:
 
 ### 6. Optional AI Summaries (feature-flagged)
 
-- [ ] Feature flag `FEATURE_SUMMARIES`
-- [ ] `GET /api/v1/events/:event_id/summary` route; returns last summary or 404 if disabled/none
-- [ ] Worker or in-process scheduler:
-  - [ ] Recompute when either: debounce 5 minutes since last change, or every 10 new feedbacks per event
-  - [ ] Input: latest N=100 feedback texts; store summary text + `updated_at`
-  - [ ] On save → emit `summary.updated`
-- [ ] Event view summary panel UI; live updates on `summary.updated`
-- [ ] Tests: job cadence logic; route 200/404; UI presence behind flag
+- [x] Feature flag `FEATURE_SUMMARIES`
+- [x] `GET /api/v1/events/:event_id/summary` route; generates OpenAI summary on-the-fly or returns 404 if disabled
+- [x] OpenAI integration:
+  - [x] Generate summary from latest N=100 feedback texts for the event
+  - [x] Use GPT model to create concise summary of feedback themes and sentiment
+  - [x] Handle API errors gracefully (timeout, rate limits, service unavailable)
+- [x] Event view summary panel UI (server-rendered; shows fallback text on errors)
+- [~] Tests: OpenAI client mocking; route 200/404/500 (done); UI loading states behind flag (pending)
 
 ### 7. Hardening, QA, and Docs
 
@@ -312,7 +312,7 @@ NEXT_PUBLIC_SOCKET_URL=ws://localhost:3000
 
 ### Day 3 (optional/extras)
 
-- [ ] Event view with summary panel (behind flag)
+- [x] Event view with summary panel (behind flag)
 - [ ] Background job cadence; `summary.updated` broadcasting
 - [ ] Polish, QA, README
 
