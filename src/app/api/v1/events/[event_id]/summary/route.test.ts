@@ -25,7 +25,7 @@ describe('api/v1/events/[event_id]/summary route', () => {
 	it('returns 404 when event not found', async () => {
 		process.env.FEATURE_SUMMARIES = 'true';
 		const { GET } = await import('./route');
-		const { EventRepositoryPrisma } = await import('@/infrastructure/repositories/prisma/EventRepositoryPrisma');
+		const { EventRepositoryPrisma } = await import('@/repositories/prisma/EventRepositoryPrisma');
 		vi.spyOn(EventRepositoryPrisma.prototype, 'getNameById').mockResolvedValueOnce(null);
 		const res = (await GET(new Request('http://localhost'), { params: { event_id: 'missing' } })) as NextResponse;
 		expect(res.status).toBe(404);
@@ -36,7 +36,7 @@ describe('api/v1/events/[event_id]/summary route', () => {
 	it('returns summary payload when enabled and event exists', async () => {
 		process.env.FEATURE_SUMMARIES = 'true';
 		const { GET } = await import('./route');
-		const { EventRepositoryPrisma } = await import('@/infrastructure/repositories/prisma/EventRepositoryPrisma');
+		const { EventRepositoryPrisma } = await import('@/repositories/prisma/EventRepositoryPrisma');
 		const { OpenAISummaryService } = await import('@/infrastructure/ai/openaiSummaryService');
 
 		vi.spyOn(EventRepositoryPrisma.prototype, 'getNameById').mockResolvedValueOnce('Event X');
