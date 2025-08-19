@@ -10,6 +10,15 @@ export function roomForEvent(eventId: string): Room {
   return `event:${eventId}`;
 }
 
+export function isValidRoom(room: string): room is Room {
+  if (room === 'feedbacks') return true;
+  if (!room.startsWith('event:')) return false;
+  const id = room.slice('event:'.length);
+  // UUID v4-ish validation (accept any canonical UUID)
+  const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+  return uuidRegex.test(id);
+}
+
 export type FeedbackCreatedEvent = {
   type: 'feedback.created';
   payload: {
@@ -20,6 +29,11 @@ export type FeedbackCreatedEvent = {
     text: string;
     created_at: string;
   };
+};
+
+export type ClientEvents = {
+  join: (room: Room) => void;
+  leave: (room: Room) => void;
 };
 
 export function emitSafely(
