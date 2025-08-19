@@ -154,12 +154,12 @@ Key points:
 
 ### 4. Realtime (Socket.IO)
 
-- [ ] `app/api/socket/route.ts` with Node runtime and CORS origins restricted to app
-- [ ] Rooms: `feedbacks` (global), `event:<event_id>` (scoped)
-- [ ] On create → server emits `feedback.created` with payload (PRD §10)
-- [ ] Client util to subscribe/unsubscribe based on filters
-- [ ] Validate room params server-side
-- [ ] Socket tests: room validation, emission shape
+- [x] `app/api/socket/route.ts` with Node runtime and CORS origins restricted to app
+- [x] Rooms: `feedbacks` (global), `event:<event_id>` (scoped)
+- [x] On create → server emits `feedback.created` with payload (PRD §10)
+- [x] Client util to subscribe/unsubscribe based on filters
+- [x] Validate room params server-side
+- [x] Socket tests: room validation, emission shape
 
 Architecture note:
 
@@ -170,7 +170,7 @@ Architecture note:
 Pages:
 
 - [ ] Home: filters (EventSelect, RatingSelect), SortToggle (Newest/Highest), SubmitForm, Live Stream (InfiniteList of FeedbackCard)
-- [ ] Optional Event view: scoped stream + Summary panel
+- [ ] Event view: scoped stream + Summary panel
 
 Components (see `UX Pilot Context.md` and mocks):
 
