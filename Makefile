@@ -7,7 +7,7 @@ DATABASE_URL ?= postgresql://postgres:postgres@localhost:5432/event_feedback_hub
 
 .PHONY: help install dev build start lint typecheck format format-check test test-watch test-e2e ci \
 	docker-build docker-run compose-up compose-down playwright-install prisma-generate prisma-migrate prisma-studio \
-	db-up db-down seed prisma-migrate-name prisma-reset reset-and-seed
+	db-up db-down seed prisma-migrate-name prisma-reset reset-and-seed wait-web e2e e2e-clean
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS=":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
@@ -47,6 +47,27 @@ playwright-install: ## Install Playwright browsers
 
 test-e2e: ## Run E2E tests (Playwright)
 	$(NPM) run test:e2e
+
+wait-web: ## Wait until the web app responds on http://localhost:3000
+	@echo "Waiting for web app to be ready at http://localhost:3000 ..."
+	@until curl -sSf http://localhost:3000 >/dev/null 2>&1; do \
+		echo "  still waiting..."; \
+		sleep 1; \
+	done
+	@echo "Web app is ready."
+
+e2e: ## Orchestrate Docker services, install deps, migrate+seed DB, wait for web, then run Playwright
+	$(MAKE) compose-up
+	$(MAKE) install
+	$(MAKE) prisma-generate
+	$(MAKE) prisma-migrate
+	$(MAKE) seed
+	$(MAKE) playwright-install
+	$(MAKE) wait-web
+	$(MAKE) test-e2e
+
+e2e-clean: ## Stop services and clean volumes after E2E
+	$(MAKE) compose-down
 
 ci: ## Lint, typecheck, unit tests (coverage)
 	$(NPM) run ci

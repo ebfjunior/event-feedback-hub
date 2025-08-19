@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ui/Avatar (snapshot) > renders image and fallback 1`] = `
+<span
+  class="relative flex size-8 shrink-0 overflow-hidden rounded-full"
+  data-slot="avatar"
+>
+  <span
+    class="bg-muted flex size-full items-center justify-center rounded-full"
+    data-slot="avatar-fallback"
+  >
+    AB
+  </span>
+</span>
+`;

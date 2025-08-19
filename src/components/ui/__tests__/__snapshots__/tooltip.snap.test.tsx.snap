@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ui/Tooltip (snapshot) > renders structure 1`] = `
+<body>
+  <div>
+    <button
+      data-slot="tooltip-trigger"
+      data-state="closed"
+    >
+      Trigger
+    </button>
+  </div>
+</body>
+`;

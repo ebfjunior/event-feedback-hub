@@ -1,0 +1,18 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ui/DropdownMenu (snapshot) > renders structure 1`] = `
+<body>
+  <div>
+    <button
+      aria-expanded="false"
+      aria-haspopup="menu"
+      data-slot="dropdown-menu-trigger"
+      data-state="closed"
+      id="radix-«r0»"
+      type="button"
+    >
+      Open
+    </button>
+  </div>
+</body>
+`;

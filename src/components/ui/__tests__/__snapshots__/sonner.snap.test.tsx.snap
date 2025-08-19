@@ -1,0 +1,10 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ui/Sonner Toaster (snapshot) > renders 1`] = `
+<div
+  class="toaster group"
+  data-mock="sonner"
+  style="--normal-bg: var(--popover); --normal-text: var(--popover-foreground); --normal-border: var(--border);"
+  theme="light"
+/>
+`;
